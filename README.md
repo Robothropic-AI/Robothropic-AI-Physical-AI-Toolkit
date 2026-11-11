@@ -83,7 +83,7 @@ physical-ai-toolkit/
 
 ## Current Build: Deployment Readiness Mapper (DRM)
 
-**Status**: In development — release target July 1–5, 2026
+**Status**: In active development — release is quality-gated
 
 The DRM is a three-agent pipeline that takes a structured description of an industrial or physical AI process and returns a structured analysis across three dimensions:
 
