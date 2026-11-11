@@ -52,3 +52,32 @@ def test_ranking_prefers_safe_easy_fit():
     assert rank_stages([risky, safe])[0][0] == 1
 
 
+def _s(i, deps=(), rework=()):
+    return Stage(id=i, name=f"s{i}", description="d", source_text=f"{i}. s{i}",
+                 depends_on=list(deps), rework_to=list(rework))
+
+
+def test_rework_loop_allowed():
+    ProcessModel(process_name="p", stages=[_s(1), _s(2, deps=[1]), _s(3, deps=[2], rework=[1])])
+
+
+def test_rework_to_unknown_stage_rejected():
+    with pytest.raises(ValidationError):
+        ProcessModel(process_name="p", stages=[_s(1), _s(2, deps=[1], rework=[9])])
+
+
+def test_rework_forward_rejected():
+    with pytest.raises(ValidationError):
+        ProcessModel(process_name="p", stages=[_s(1, rework=[2]), _s(2, deps=[1])])
+
+
+def test_cycle_in_depends_on_rejected():
+    with pytest.raises(ValidationError):
+        ProcessModel(process_name="p", stages=[_s(1, deps=[2]), _s(2, deps=[1])])
+
+
+def test_self_dependency_rejected():
+    with pytest.raises(ValidationError):
+        ProcessModel(process_name="p", stages=[_s(1, deps=[1])])
+
+
