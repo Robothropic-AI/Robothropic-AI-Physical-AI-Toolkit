@@ -86,6 +86,23 @@ def _extract_json(raw: str) -> dict:
     return json.loads(text[start:end + 1])
 
 
+def build_user_prompt(input_text: str) -> str:
+    return f"<process_description>\n{input_text}\n</process_description>"
+
+
+def build_retry_prompt(input_text: str, raw: str, error: str) -> str:
+    return (f"{build_user_prompt(input_text)}\n\nPrevious attempt failed validation. Fix every problem "
+            f"and return the complete corrected JSON object only.\n<previous_output>\n{raw[:6000]}\n"
+            f"</previous_output>\n<validation_error>\n{error[:2000]}\n</validation_error>")
+
+
+def parse_and_check(raw: str, input_text: str) -> ProcessModel:
+    """Raw model reply -> validated ProcessModel, or ValueError with a readable message."""
+    model = ProcessModel.model_validate(_extract_json(raw))
+    check_traceability(model, input_text)
+    return model
+
+
 def _call(client, system: str, user: str) -> str:
     resp = client.messages.create(
         model=config.MODEL,
@@ -102,19 +119,14 @@ def decompose(input_text: str, client=None, max_retries: int = 2) -> ProcessMode
         import anthropic  # imported lazily so tests do not need the package or a key
         client = anthropic.Anthropic()
     system = build_system_prompt()
-    base = f"<process_description>\n{input_text}\n</process_description>"
-    user, last_error = base, ""
+    user, last_error = build_user_prompt(input_text), ""
     for _ in range(max_retries + 1):
         raw = _call(client, system, user)
         try:
-            model = ProcessModel.model_validate(_extract_json(raw))
-            check_traceability(model, input_text)
-            return model
+            return parse_and_check(raw, input_text)
         except ValueError as exc:  # JSON errors and pydantic ValidationError both land here
             last_error = str(exc)
-            user = (f"{base}\n\nPrevious attempt failed validation. Fix every problem and return "
-                    f"the complete corrected JSON object only.\n<previous_output>\n{raw[:6000]}\n"
-                    f"</previous_output>\n<validation_error>\n{last_error[:2000]}\n</validation_error>")
+            user = build_retry_prompt(input_text, raw, last_error)
     raise DecompositionError(f"no valid ProcessModel after {max_retries + 1} attempts: {last_error[:500]}")
 
 
