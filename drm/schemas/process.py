@@ -4,6 +4,9 @@ from pydantic import Field, model_validator
 from .common import Strict
 
 
+_HEDGES = ("implied", "assumed", "likely", "probably")
+
+
 class ReworkEdge(Strict):
     """A loop-back and the condition that triggers it."""
     to: int = Field(ge=1)
@@ -14,12 +17,25 @@ class Stage(Strict):
     id: int = Field(ge=1)
     name: str
     description: str
-    actors: list[str] = []
-    inputs: list[str] = []
-    outputs: list[str] = []
+    actors: list[str] = []   # people and roles only
+    systems: list[str] = []  # equipment, machines, software
+    records: list[str] = []  # documents, logs, specifications, data systems
+    inputs: list[str] = []   # only items the source text names
+    outputs: list[str] = []  # only items the source text names
     depends_on: list[int] = []  # forward dependencies only: must form a DAG
     rework_to: list[ReworkEdge] = []  # explicit loop-backs, each with its trigger condition
     source_text: str  # exact input line, so every later claim is traceable
+
+    @model_validator(mode="after")
+    def _no_hedges_in_names(self):
+        # Inferences belong in ProcessModel.assumptions / ambiguities, not inside names.
+        for field in ("actors", "systems", "records"):
+            for entry in getattr(self, field):
+                if any(w in entry.lower() for w in _HEDGES):
+                    raise ValueError(
+                        f"stage {self.id}: '{entry}' hedges inside a name; "
+                        "put inferences in assumptions or ambiguities")
+        return self
 
 
 class ProcessModel(Strict):
