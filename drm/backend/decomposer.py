@@ -45,7 +45,8 @@ Rules:
 4. `depends_on` lists the stages that must finish before this stage can start. It describes
    forward flow only and must never form a cycle.
 5. Loop-backs (for example "failing lots return to stage 2 for rework") go in `rework_to`,
-   never in `depends_on`. `rework_to` must point to an earlier or the same stage.
+   never in `depends_on`. Each entry is an object {{"to": <stage id>, "when": <the condition
+   that triggers the loop-back, taken from the text>}}. `to` must be an earlier or the same stage.
 6. `actors` lists only people, roles or systems named or clearly implied by the line.
    `inputs` and `outputs` list only materials, data or records named or clearly implied.
 7. Describe the process AS WRITTEN. Do not add AI, automation or improvements; later
@@ -130,6 +131,9 @@ def decompose(input_text: str, client=None, max_retries: int = 2) -> ProcessMode
     raise DecompositionError(f"no valid ProcessModel after {max_retries + 1} attempts: {last_error[:500]}")
 
 
+
+
+
 if __name__ == "__main__":  # python -m drm.backend.decomposer <path-to-process-file>
     if len(sys.argv) != 2:
         sys.exit("usage: python -m drm.backend.decomposer <process_file>")
@@ -137,4 +141,4 @@ if __name__ == "__main__":  # python -m drm.backend.decomposer <path-to-process-
     with open(sys.argv[1], encoding="utf-8") as fh:
         print(decompose(fh.read()).model_dump_json(indent=2))
 
-
+  
