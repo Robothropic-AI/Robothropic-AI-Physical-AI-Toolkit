@@ -213,7 +213,10 @@
         9
       ],
       "rework_to": [
-        2
+        {
+          "to": 2,
+          "when": "failing lot is sent to rework (strip and recoat) instead of scrap"
+        }
       ],
       "source_text": "Disposition and records: passing lots are released to packing. Failing lots go to rework (strip and recoat, returning to stage 2) or scrap. The batch record is completed for traceability."
     }
