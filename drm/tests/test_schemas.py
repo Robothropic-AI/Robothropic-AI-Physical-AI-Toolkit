@@ -54,7 +54,8 @@ def test_ranking_prefers_safe_easy_fit():
 
 def _s(i, deps=(), rework=()):
     return Stage(id=i, name=f"s{i}", description="d", source_text=f"{i}. s{i}",
-                 depends_on=list(deps), rework_to=list(rework))
+                 depends_on=list(deps),
+                 rework_to=[ReworkEdge(to=t, when="test condition") for t in rework])
 
 
 def test_rework_loop_allowed():
@@ -80,4 +81,10 @@ def test_self_dependency_rejected():
     with pytest.raises(ValidationError):
         ProcessModel(process_name="p", stages=[_s(1, deps=[1])])
 
+
+def test_rework_edge_requires_a_condition():
+    with pytest.raises(ValidationError):
+        ReworkEdge(to=2, when="")
+    with pytest.raises(ValidationError):
+        ReworkEdge(to=2)
 
