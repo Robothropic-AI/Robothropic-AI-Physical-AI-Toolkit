@@ -41,7 +41,7 @@ def good_payload(drop=None, alter=None):
         stages.append({"id": i, "name": f"stage {i}", "description": line,
                        "source_text": "changed" if i == alter else line,
                        "depends_on": [i - 1] if i > 1 else [],
-                       "rework_to": [2] if i == 10 else []})
+                       "rework_to": [{"to": 2, "when": "lot fails QC and is reworked"}] if i == 10 else []})
     return {"process_name": "AR coating line", "stages": stages}
 
 
@@ -57,7 +57,7 @@ def test_success_and_request_shape():
     client = FakeClient([good()])
     model = decompose(EXAMPLE, client=client)
     assert len(model.stages) == 10
-    assert model.stages[9].rework_to == [2]
+    assert [(e.to, e.when) for e in model.stages[9].rework_to] == [(2, "lot fails QC and is reworked")]
     call = client.calls[0]
     assert call["model"] == config.MODEL
     assert call["output_config"] == {"effort": config.EFFORT}
