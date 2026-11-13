@@ -40,7 +40,8 @@ def summarise(model: ProcessModel) -> str:
     for s in model.stages:
         loops = [f"->{e.to} if {e.when}" for e in s.rework_to]
         rows.append(f"{s.id:>2}  {s.name[:44]:<44} depends_on={s.depends_on} rework={loops}")
-        rows.append(f"      actors={s.actors} inputs={s.inputs} outputs={s.outputs}")
+        rows.append(f"      actors={s.actors} systems={s.systems} records={s.records}")
+        rows.append(f"      inputs={s.inputs} outputs={s.outputs}")
     rows += ["", f"Assumptions ({len(model.assumptions)}):"] + [f"  - {a}" for a in model.assumptions]
     rows += ["", f"Ambiguities ({len(model.ambiguities)}):"] + [f"  - {a}" for a in model.ambiguities]
     return "\n".join(rows)
