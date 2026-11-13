@@ -98,3 +98,10 @@ def test_prompt_embeds_schema_and_rules():
     p = build_system_prompt()
     assert "rework_to" in p and "ONLY one JSON object" in p
 
+
+def test_prompt_states_new_rules():
+    p = build_system_prompt()
+    for phrase in ("follow the numbered order", "`systems`", "`records`", "Never put words such as"):
+        assert phrase in p
+
+
