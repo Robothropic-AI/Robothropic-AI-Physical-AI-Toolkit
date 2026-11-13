@@ -1,0 +1,242 @@
+{
+  "process_name": "Anti-reflective coating of optical lenses, batch vacuum deposition line",
+  "stages": [
+    {
+      "id": 1,
+      "name": "Incoming inspection",
+      "description": "The operator visually inspects each lot of lens substrates for scratches, chips and contamination, and logs the lot number and findings.",
+      "actors": [
+        "Operator"
+      ],
+      "inputs": [
+        "Lot of lens substrates"
+      ],
+      "outputs": [
+        "Inspection log (lot number and findings)"
+      ],
+      "depends_on": [],
+      "rework_to": [],
+      "source_text": "Incoming inspection: the operator visually inspects each lot of lens substrates for scratches, chips and contamination, and logs the lot number and findings."
+    },
+    {
+      "id": 2,
+      "name": "Ultrasonic cleaning",
+      "description": "The operator loads substrates into baskets, selects the cleaning recipe for the lot, and runs them through a multi-tank ultrasonic line.",
+      "actors": [
+        "Operator",
+        "Multi-tank ultrasonic cleaning line"
+      ],
+      "inputs": [
+        "Inspected lens substrates",
+        "Baskets",
+        "Cleaning recipe"
+      ],
+      "outputs": [
+        "Cleaned substrates"
+      ],
+      "depends_on": [
+        1
+      ],
+      "rework_to": [],
+      "source_text": "Ultrasonic cleaning: the operator loads substrates into baskets, selects the cleaning recipe for the lot, and runs them through a multi-tank ultrasonic line."
+    },
+    {
+      "id": 3,
+      "name": "Drying and fixturing",
+      "description": "After drying, the operator mounts substrates in the coating fixture (planetary dome) in a laminar-flow area, recording positions.",
+      "actors": [
+        "Operator"
+      ],
+      "inputs": [
+        "Cleaned substrates",
+        "Coating fixture (planetary dome)"
+      ],
+      "outputs": [
+        "Loaded dome",
+        "Record of substrate positions"
+      ],
+      "depends_on": [
+        2
+      ],
+      "rework_to": [],
+      "source_text": "Drying and fixturing: after drying, the operator mounts substrates in the coating fixture (planetary dome) in a laminar-flow area, recording positions."
+    },
+    {
+      "id": 4,
+      "name": "Chamber loading and pump-down",
+      "description": "The operator loads the dome into the vacuum chamber and starts pump-down. The process waits until base pressure is reached.",
+      "actors": [
+        "Operator",
+        "Vacuum chamber and pumping system"
+      ],
+      "inputs": [
+        "Loaded dome"
+      ],
+      "outputs": [
+        "Chamber at base pressure with dome loaded"
+      ],
+      "depends_on": [
+        3
+      ],
+      "rework_to": [],
+      "source_text": "Chamber loading and pump-down: the operator loads the dome into the vacuum chamber and starts pump-down. The process waits until base pressure is reached."
+    },
+    {
+      "id": 5,
+      "name": "Recipe selection",
+      "description": "The process engineer selects the coating recipe (layer materials, thicknesses, deposition rates) from the recipe library and confirms it against the customer specification.",
+      "actors": [
+        "Process engineer"
+      ],
+      "inputs": [
+        "Recipe library",
+        "Customer specification"
+      ],
+      "outputs": [
+        "Selected and confirmed coating recipe"
+      ],
+      "depends_on": [
+        3
+      ],
+      "rework_to": [],
+      "source_text": "Recipe selection: the process engineer selects the coating recipe (layer materials, thicknesses, deposition rates) from the recipe library and confirms it against the customer specification."
+    },
+    {
+      "id": 6,
+      "name": "Deposition run",
+      "description": "E-beam evaporation with ion assist runs the layer sequence. The PLC controls shutters and rates, thickness is monitored by quartz crystal and optical monitoring, and the operator watches for deviations and can abort the run.",
+      "actors": [
+        "Operator",
+        "PLC",
+        "E-beam evaporation system with ion assist",
+        "Quartz crystal monitor",
+        "Optical monitor"
+      ],
+      "inputs": [
+        "Selected coating recipe",
+        "Chamber at base pressure with dome loaded",
+        "Layer coating materials"
+      ],
+      "outputs": [
+        "Coated substrates (in chamber)",
+        "Witness samples"
+      ],
+      "depends_on": [
+        4,
+        5
+      ],
+      "rework_to": [],
+      "source_text": "Deposition run: e-beam evaporation with ion assist runs the layer sequence. The PLC controls shutters and rates, thickness is monitored by quartz crystal and optical monitoring, and the operator watches for deviations and can abort the run."
+    },
+    {
+      "id": 7,
+      "name": "Venting and unloading",
+      "description": "The chamber is vented, the dome cools, and the operator unloads the substrates.",
+      "actors": [
+        "Operator",
+        "Vacuum chamber"
+      ],
+      "inputs": [
+        "Coated substrates in chamber"
+      ],
+      "outputs": [
+        "Unloaded coated substrates",
+        "Witness samples"
+      ],
+      "depends_on": [
+        6
+      ],
+      "rework_to": [],
+      "source_text": "Venting and unloading: the chamber is vented, the dome cools, and the operator unloads the substrates."
+    },
+    {
+      "id": 8,
+      "name": "Optical QC",
+      "description": "Witness samples are measured on a spectrophotometer, and reflectance is compared against the specification to give pass or fail.",
+      "actors": [
+        "Spectrophotometer",
+        "QC personnel (implied)"
+      ],
+      "inputs": [
+        "Witness samples",
+        "Reflectance specification"
+      ],
+      "outputs": [
+        "Reflectance measurements",
+        "Pass/fail result"
+      ],
+      "depends_on": [
+        7
+      ],
+      "rework_to": [],
+      "source_text": "Optical QC: witness samples are measured on a spectrophotometer, and reflectance is compared against the specification to give pass or fail."
+    },
+    {
+      "id": 9,
+      "name": "Cosmetic inspection",
+      "description": "The operator inspects each lens under an inspection lamp for pinholes, haze and stains.",
+      "actors": [
+        "Operator"
+      ],
+      "inputs": [
+        "Coated lenses",
+        "Inspection lamp"
+      ],
+      "outputs": [
+        "Cosmetic inspection findings"
+      ],
+      "depends_on": [
+        7
+      ],
+      "rework_to": [],
+      "source_text": "Cosmetic inspection: the operator inspects each lens under an inspection lamp for pinholes, haze and stains."
+    },
+    {
+      "id": 10,
+      "name": "Disposition and records",
+      "description": "Passing lots are released to packing. Failing lots go to rework (strip and recoat, returning to stage 2) or scrap. The batch record is completed for traceability.",
+      "actors": [
+        "Operator or QC personnel (implied)"
+      ],
+      "inputs": [
+        "Optical QC pass/fail result",
+        "Cosmetic inspection findings",
+        "Lot"
+      ],
+      "outputs": [
+        "Lots released to packing",
+        "Lots routed to rework or scrap",
+        "Completed batch record"
+      ],
+      "depends_on": [
+        8,
+        9
+      ],
+      "rework_to": [
+        2
+      ],
+      "source_text": "Disposition and records: passing lots are released to packing. Failing lots go to rework (strip and recoat, returning to stage 2) or scrap. The batch record is completed for traceability."
+    }
+  ],
+  "assumptions": [
+    "Stage 5 (recipe selection) is modelled as depending only on stage 3, since it does not need the chamber at base pressure and could occur in parallel with pump-down; the text does not state its timing explicitly.",
+    "Stage 6 depends on both stage 4 (base pressure reached) and stage 5 (recipe confirmed).",
+    "Witness samples are assumed to be coated in the same run as the lenses (placed in the dome) and unloaded in stage 7, although the text does not say where they are loaded.",
+    "Stage 9 (cosmetic inspection) is assumed to follow unloading (stage 7) and to be independent of optical QC (stage 8), so the two can run in parallel.",
+    "The actor for optical QC and for disposition is not named; a QC technician or operator is assumed.",
+    "Loop-back from stage 10 goes to stage 2 as written, and the 'strip' step is assumed to be part of the rework path rather than a separate stage, since stage count must match the numbered lines.",
+    "Scrap and release-to-packing are treated as terminal outcomes of stage 10."
+  ],
+  "ambiguities": [
+    "Where and when are witness samples loaded, and are they placed in the dome in stage 3?",
+    "Who performs the optical QC measurements and the final disposition decision (operator, QC technician, quality engineer)?",
+    "What is the base pressure target and who confirms it has been reached?",
+    "Who decides between rework and scrap for failing lots, and on what criteria (e.g. number of prior recoats, defect type)?",
+    "Does a cosmetic inspection failure also trigger rework or scrap, or only optical QC failures?",
+    "Where is the strip step performed, and is stripped material re-inspected at stage 1 or does it re-enter directly at stage 2?",
+    "What happens to a run aborted by the operator in stage 6 (partial coating, rework path, scrap)?",
+    "What records and data (recipe ID, run logs, thickness readings) are captured in the batch record, and in what system?",
+    "Is stage 5 recipe selection done before or during pump-down, and can it change after the chamber is loaded?"
+  ]
+}
+
