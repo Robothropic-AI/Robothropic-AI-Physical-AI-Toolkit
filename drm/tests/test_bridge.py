@@ -35,3 +35,16 @@ def test_non_json_is_reported():
     model, err = check_reply(EXAMPLE, "Sorry, I cannot do that.")
     assert model is None and err
 
+
+def test_reference_model_matches_the_example_and_is_not_approvable_yet():
+    from drm.schemas import ApprovedProcessModel
+    import pytest
+    from pydantic import ValidationError
+    fixture = (Path(__file__).parents[1] / "examples" / "optical_coating_line.processmodel.json").read_text(encoding="utf-8")
+    model, err = check_reply(EXAMPLE, fixture)
+    assert model is not None, err
+    # open ambiguities exist, so the approval gate must refuse it
+    with pytest.raises(ValidationError):
+        ApprovedProcessModel(process=model, approved_by="someone")
+
+
