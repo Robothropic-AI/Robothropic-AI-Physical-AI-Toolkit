@@ -9,7 +9,7 @@ EXAMPLE = (Path(__file__).parents[1] / "examples" / "optical_coating_line.md").r
 
 def reply(drop=None):
     stages = [{"id": i, "name": f"stage {i}", "description": t, "source_text": t,
-               "depends_on": [i - 1] if i > 1 else [], "rework_to": [2] if i == 10 else []}
+               "depends_on": [i - 1] if i > 1 else [], "rework_to": [{"to": 2, "when": "lot fails QC and is reworked"}] if i == 10 else []}
               for i, t in numbered_lines(EXAMPLE).items() if i != drop]
     return json.dumps({"process_name": "AR coating line", "stages": stages})
 
@@ -23,7 +23,7 @@ def test_valid_reply_with_chat_prose_and_fence():
     chatty = "Here is the model:\n```json\n" + reply() + "\n```\nLet me know if you want changes."
     model, err = check_reply(EXAMPLE, chatty)
     assert model is not None and err == "" and len(model.stages) == 10
-    assert "VALID" not in summarise(model) and "rework_to=[2]" in summarise(model)
+    assert "VALID" not in summarise(model) and "->2 if lot fails QC and is reworked" in summarise(model)
 
 
 def test_dropped_stage_is_reported():
@@ -34,5 +34,4 @@ def test_dropped_stage_is_reported():
 def test_non_json_is_reported():
     model, err = check_reply(EXAMPLE, "Sorry, I cannot do that.")
     assert model is None and err
-
 
