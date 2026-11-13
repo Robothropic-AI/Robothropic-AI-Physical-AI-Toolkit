@@ -4,6 +4,12 @@ from pydantic import Field, model_validator
 from .common import Strict
 
 
+class ReworkEdge(Strict):
+    """A loop-back and the condition that triggers it."""
+    to: int = Field(ge=1)
+    when: str = Field(min_length=1)  # e.g. "optical QC fails and the lot is reworked"
+
+
 class Stage(Strict):
     id: int = Field(ge=1)
     name: str
@@ -12,7 +18,7 @@ class Stage(Strict):
     inputs: list[str] = []
     outputs: list[str] = []
     depends_on: list[int] = []  # forward dependencies only: must form a DAG
-    rework_to: list[int] = []   # explicit loop-backs (e.g. failed QC -> re-clean)
+    rework_to: list[ReworkEdge] = []  # explicit loop-backs, each with its trigger condition
     source_text: str  # exact input line, so every later claim is traceable
 
 
@@ -32,9 +38,9 @@ class ProcessModel(Strict):
                 raise ValueError(f"stage {s.id} depends on unknown stage(s) {sorted(missing)}")
             if s.id in s.depends_on:
                 raise ValueError(f"stage {s.id} depends on itself")
-            if missing := set(s.rework_to) - ids:
+            if missing := {e.to for e in s.rework_to} - ids:
                 raise ValueError(f"stage {s.id} reworks to unknown stage(s) {sorted(missing)}")
-            if any(t > s.id for t in s.rework_to):
+            if any(e.to > s.id for e in s.rework_to):
                 raise ValueError(f"stage {s.id}: rework_to must point to an earlier or same stage")
         self._require_acyclic({s.id: list(s.depends_on) for s in self.stages})
         return self
@@ -56,8 +62,4 @@ class ProcessModel(Strict):
 
         for n in graph:
             visit(n)
-
-
-
-
 
