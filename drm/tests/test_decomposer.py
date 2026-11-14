@@ -105,3 +105,23 @@ def test_prompt_states_new_rules():
         assert phrase in p
 
 
+ADHESIVE = (Path(__file__).parents[1] / "examples" / "adhesive_batch_line.md").read_text(encoding="utf-8")
+
+
+def test_wrapped_lines_and_mixed_numbering_are_parsed():
+    lines = numbered_lines(ADHESIVE)
+    assert sorted(lines) == list(range(1, 10))
+    assert lines[3].endswith("prepares the viscometer and density meter (see SOP-12).")
+    assert "(back to 4)." in lines[5]
+    assert lines[1].startswith("Raw materials")
+
+
+def test_blank_line_ends_a_continuation():
+    text = "1. First item\n   continued here\n\n   not a continuation\n2. Second"
+    assert numbered_lines(text) == {1: "First item continued here", 2: "Second"}
+
+
+def test_prompt_mentions_continuation_rule():
+    assert "joined by single spaces" in build_system_prompt()
+
+
