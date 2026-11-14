@@ -1,15 +1,18 @@
 """Manual bridge: run the Decomposer's prompt by hand when no API credit is available.
 
 Workflow (PowerShell, from the repo root, venv active):
-  1. python -m drm.backend.bridge prompt drm/examples/optical_coating_line.md
+  1. python -m drm.backend.bridge prompt <process_file>
         -> writes bridge_prompt.txt; paste its whole contents into a fresh Claude chat.
-  2. Copy Claude's reply, then:  Get-Clipboard | Set-Content bridge_reply.json -Encoding utf8
-  3. python -m drm.backend.bridge check drm/examples/optical_coating_line.md
-        -> applies the same schema and traceability checks as the live Decomposer.
-        On failure it writes bridge_retry_prompt.txt to paste back into the same chat.
+  2. Copy Claude's reply with the chat's copy button, and copy nothing else afterwards.
+  3. python -m drm.backend.bridge check <process_file> --clipboard
+        -> reads the reply straight from the clipboard (no file or editor needed) and
+           applies the same schema and traceability checks as the live Decomposer.
+        Alternatively: check <process_file> <reply_file> reads a saved file instead.
+  On failure the checker shows what it actually read, and writes bridge_retry_prompt.txt.
 """
 from __future__ import annotations
 
+import subprocess
 import sys
 
 from drm.backend.decomposer import (build_retry_prompt, build_system_prompt,
@@ -35,6 +38,12 @@ def check_reply(process_text: str, reply_text: str) -> tuple[ProcessModel | None
         return None, str(exc)
 
 
+def describe(text: str, limit: int = 300) -> str:
+    """Say what was read, so a wrong clipboard or file is obvious at a glance."""
+    head = " ".join(text[:limit].split())
+    return f"Read {len(text)} characters. It starts with: {head!r}"
+
+
 def summarise(model: ProcessModel) -> str:
     rows = [f"Process: {model.process_name}", ""]
     for s in model.stages:
@@ -45,6 +54,19 @@ def summarise(model: ProcessModel) -> str:
     rows += ["", f"Assumptions ({len(model.assumptions)}):"] + [f"  - {a}" for a in model.assumptions]
     rows += ["", f"Ambiguities ({len(model.ambiguities)}):"] + [f"  - {a}" for a in model.ambiguities]
     return "\n".join(rows)
+
+
+def read_clipboard() -> str:
+    """Read the Windows clipboard through PowerShell (no extra Python package needed)."""
+    cmd = ["powershell", "-NoProfile", "-Command",
+           "[Console]::OutputEncoding=[Text.Encoding]::UTF8; Get-Clipboard -Raw"]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+    except FileNotFoundError as exc:
+        raise RuntimeError("--clipboard needs PowerShell (Windows); use a reply file instead") from exc
+    if result.returncode != 0:
+        raise RuntimeError(f"could not read the clipboard: {result.stderr.strip()[:200]}")
+    return result.stdout
 
 
 def _read(path: str) -> str:
@@ -61,7 +83,14 @@ def main(argv: list[str]) -> int:
         return 0
     if len(argv) >= 3 and argv[1] == "check":
         process_text = _read(argv[2])
-        reply = _read(argv[3] if len(argv) > 3 else REPLY_FILE)
+        source = argv[3] if len(argv) > 3 else REPLY_FILE
+        if source == "--clipboard":
+            reply = read_clipboard()
+            with open(REPLY_FILE, "w", encoding="utf-8") as fh:
+                fh.write(reply)
+        else:
+            reply = _read(source)
+        print(describe(reply) + "\n")
         model, error = check_reply(process_text, reply)
         if model is not None:
             print("VALID: schema and traceability checks passed.\n")
@@ -70,13 +99,14 @@ def main(argv: list[str]) -> int:
         with open(RETRY_FILE, "w", encoding="utf-8") as fh:
             fh.write(build_retry_prompt(process_text, reply, error))
         print("INVALID:\n" + error[:1500])
-        print(f"\nWrote {RETRY_FILE}. Paste it into the same chat, save the new reply, and check again.")
+        print(f"\nWrote {RETRY_FILE}. Paste it into the same chat, copy the new reply, and check again.")
         return 1
     print("usage:\n  python -m drm.backend.bridge prompt <process_file>\n"
-          "  python -m drm.backend.bridge check <process_file> [reply_file]")
+          "  python -m drm.backend.bridge check <process_file> [--clipboard | reply_file]")
     return 2
 
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
+
 
