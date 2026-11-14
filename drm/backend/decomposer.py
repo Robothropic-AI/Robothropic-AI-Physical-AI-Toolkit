@@ -28,8 +28,23 @@ class DecompositionError(Exception):
 
 
 def numbered_lines(text: str) -> dict[int, str]:
-    """Map stage number -> the text of that numbered line (without the number)."""
-    return {int(m.group(1)): m.group(2).strip() for m in _NUMBERED.finditer(text)}
+    """Map stage number -> the text of that numbered item (without the number).
+
+    Accepts "1." and "1)" numbering. Indented lines directly after a numbered line are
+    treated as its continuation (wrapped text) and joined with single spaces.
+    """
+    out: dict[int, str] = {}
+    current: int | None = None
+    for raw in text.splitlines():
+        m = _NUMBERED.match(raw)
+        if m:
+            current = int(m.group(1))
+            out[current] = m.group(2).strip()
+        elif current is not None and raw[:1] in (" ", "\t") and raw.strip():
+            out[current] += " " + raw.strip()
+        else:
+            current = None
+    return out
 
 
 def build_system_prompt() -> str:
@@ -41,7 +56,9 @@ Rules:
 1. Output ONLY one JSON object that conforms to the JSON Schema below. No prose, no code fences.
 2. Produce exactly one stage per numbered line. Do not merge, split, drop or add stages.
    Stage ids must equal the numbers in the input.
-3. `source_text` must be the exact text of the numbered line, without its number.
+3. `source_text` must be the exact text of the numbered line, without its number. If an item
+   continues on following indented lines, `source_text` is the whole item with those lines
+   joined by single spaces.
 4. `depends_on`: follow the numbered order. Each stage depends on the stage before it, unless the
    text states a different ordering or the order is physically impossible. If you suspect stages
    could run in parallel or in another order, do NOT encode that: ask about it in `ambiguities`.
@@ -145,4 +162,4 @@ if __name__ == "__main__":  # python -m drm.backend.decomposer <path-to-process-
     with open(sys.argv[1], encoding="utf-8") as fh:
         print(decompose(fh.read()).model_dump_json(indent=2))
 
-  
+
