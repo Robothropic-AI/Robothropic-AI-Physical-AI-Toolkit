@@ -65,6 +65,11 @@ def test_system_prompt_has_anchors_schema_and_constraint_text():
     assert "No human-oversight constraint" in analyst.build_analyst_system_prompt()
 
 
+def test_prompt_asks_for_recovery_paths_and_forbids_extra_keys():
+    p = analyst.build_analyst_system_prompt()
+    assert "AFTER considering recovery paths" in p and "Never add keys of your own" in p
+
+
 def test_user_prompt_includes_model_and_resolutions_only_when_approved():
     assert "<resolutions>" not in analyst.build_analyst_user_prompt(PROCESS)
     u = analyst.build_analyst_user_prompt(approved())
@@ -148,5 +153,4 @@ def test_bridge_analysis_flow(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(bridge, "read_clipboard", lambda: reply(hil="none"))
     assert bridge.main(["bridge", "analysis-check", str(FIXTURE), "--clipboard", "--oversight", "mandatory"]) == 1
     assert "mandatory" in capsys.readouterr().out and os.path.exists("bridge_analysis_retry_prompt.txt")
-
 
