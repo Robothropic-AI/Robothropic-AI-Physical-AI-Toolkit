@@ -62,7 +62,7 @@ def tiers(analyses) -> dict[int, int]:
     return out
 
 
-def standard_limitations(constraints: Constraints, provisional: bool) -> str:
+def standard_limitations(constraints: Constraints, provisional: bool, provenance: list[str] | None = None) -> str:
     lines = [
         "- Scores are judgments made by a language model on anchored 1-5 scales, applied to a process "
         "description written by people. They are a structured starting point for review by a process "
@@ -78,10 +78,11 @@ def standard_limitations(constraints: Constraints, provisional: bool) -> str:
     ]
     if provisional:
         lines.append("- This analysis is PROVISIONAL: the process model has not been approved by a named "
-                     "person, and the open questions below remain to be resolved.")
+                     "person, and the open questions listed in this report remain to be resolved.")
     if constraints.human_oversight != HumanOversight.UNSPECIFIED:
         lines.append(f"- Human oversight constraint applied: {constraints.human_oversight.value}.")
     lines += [f"- Constraint from the process owner: {n}" for n in constraints.notes]
+    lines += [f"- Provenance: {p}" for p in (provenance or [])]
     return "\n".join(lines)
 
 
@@ -142,7 +143,7 @@ def offline_narrative(process: ProcessModel, analysis: AnalystOutput, provisiona
 
 def build_report(process: ProcessModel | ApprovedProcessModel, analysis: AnalystOutput,
                  constraints: Constraints | None = None,
-                 narrative: SynthesizerOutput | None = None) -> DRMReport:
+                 narrative: SynthesizerOutput | None = None, provenance: list[str] | None = None) -> DRMReport:
     constraints = constraints or Constraints()
     model, resolutions = _unwrap(process)
     provisional = is_provisional(process)
@@ -157,7 +158,7 @@ def build_report(process: ProcessModel | ApprovedProcessModel, analysis: Analyst
         executive_summary=text.executive_summary, priorities=priorities,
         cross_cutting_risks=text.cross_cutting_risks,
         open_questions_for_partner=[] if isinstance(process, ApprovedProcessModel) else list(model.ambiguities),
-        limitations=standard_limitations(constraints, provisional),
+        limitations=standard_limitations(constraints, provisional, provenance),
         narrative_source="model" if narrative else "offline")
 
 
