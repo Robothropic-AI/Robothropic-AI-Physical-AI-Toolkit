@@ -2,7 +2,7 @@
 
 **Status: PROVISIONAL.** The process model has not been approved by a named person; open questions remain.
 
-Human oversight constraint: mandatory. Wording generated from the scores by plain templates; no language-model narrative.
+Human oversight constraint: mandatory.
 
 ## Executive summary
 
