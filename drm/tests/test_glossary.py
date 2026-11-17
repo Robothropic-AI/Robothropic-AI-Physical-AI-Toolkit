@@ -50,3 +50,21 @@ def test_report_command_out_name_and_note(tmp_path, monkeypatch):
     assert not Path("drm_report.md").exists()  # nothing written to the current folder
 
 
+def test_report_command_prints_full_paths_and_sizes(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    Path("analysis.json").write_text(ANALYSIS.model_dump_json(), encoding="utf-8")
+    out = tmp_path / "r"
+    assert bridge.main(["bridge", "report", str(FIXTURE), "analysis.json", "--out", str(out), "--name", "x"]) == 0
+    text = capsys.readouterr().out
+    assert str(out / "x.md") in text and str(out / "x.json") in text and "bytes" in text
+
+
+def test_open_flag_opens_the_folder(tmp_path, monkeypatch):
+    import os
+    opened = []
+    monkeypatch.setattr(os, "startfile", lambda folder: opened.append(folder), raising=False)
+    monkeypatch.chdir(tmp_path)
+    Path("analysis.json").write_text(ANALYSIS.model_dump_json(), encoding="utf-8")
+    assert bridge.main(["bridge", "report", str(FIXTURE), "analysis.json", "--out", str(tmp_path / "o"), "--open"]) == 0
+    assert opened == [str(tmp_path / "o")]
+
