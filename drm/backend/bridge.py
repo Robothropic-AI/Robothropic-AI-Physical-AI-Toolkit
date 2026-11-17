@@ -17,9 +17,13 @@ import sys
 
 from drm.backend.analyst import (build_analyst_retry_prompt, build_analyst_system_prompt,
                                  build_analyst_user_prompt, is_provisional, parse_and_check_analysis)
-from drm.backend.decomposer import (build_retry_prompt, build_system_prompt,
+from drm.backend.analyst import check_analysis
+from drm.backend.decomposer import (_extract_json, build_retry_prompt, build_system_prompt,
                                     build_user_prompt, parse_and_check)
+from drm.backend.render import render_markdown
 from drm.backend.scoring import priority_score, rank_stages
+from drm.backend.synthesizer import (SynthesizerOutput, build_report, build_synth_retry_prompt,
+                                     build_synth_system_prompt, build_synth_user_prompt, parse_and_check_synthesis)
 from drm.schemas import (AnalystOutput, ApprovedProcessModel, Constraints, HumanOversight,
                          ProcessModel)
 
@@ -29,6 +33,11 @@ RETRY_FILE = "bridge_retry_prompt.txt"
 ANALYSIS_PROMPT_FILE = "bridge_analysis_prompt.txt"
 ANALYSIS_REPLY_FILE = "bridge_analysis_reply.json"
 ANALYSIS_RETRY_FILE = "bridge_analysis_retry_prompt.txt"
+REPORT_PROMPT_FILE = "bridge_report_prompt.txt"
+REPORT_REPLY_FILE = "bridge_report_reply.json"
+REPORT_RETRY_FILE = "bridge_report_retry_prompt.txt"
+REPORT_MD = "drm_report.md"
+REPORT_JSON = "drm_report.json"
 
 
 def make_prompt(process_text: str) -> str:
@@ -112,6 +121,24 @@ def _constraints(args: list[str]) -> Constraints:
     return Constraints(human_oversight=HumanOversight(value)) if value else Constraints()
 
 
+def load_analysis(path: str) -> AnalystOutput:
+    return AnalystOutput.model_validate(_extract_json(_read(path)))
+
+
+def _report_inputs(args: list[str]):
+    """Parse: <processmodel.json> <analysis.json> [reply_file] [--clipboard] [--oversight X]."""
+    value = _option(args, "--oversight")
+    positional = [a for a in args if not a.startswith("--") and a != value]
+    return positional, "--clipboard" in args, _constraints(args)
+
+
+def write_report(report) -> None:
+    with open(REPORT_JSON, "w", encoding="utf-8") as fh:
+        fh.write(report.model_dump_json(indent=2))
+    with open(REPORT_MD, "w", encoding="utf-8") as fh:
+        fh.write(render_markdown(report))
+
+
 def read_clipboard() -> str:
     """Read the Windows clipboard through PowerShell (no extra Python package needed)."""
     cmd = ["powershell", "-NoProfile", "-Command",
@@ -185,10 +212,59 @@ def main(argv: list[str]) -> int:
         print("INVALID:\n" + error[:1500])
         print(f"\nWrote {ANALYSIS_RETRY_FILE}. Paste it into the same chat, copy the new reply, and check again.")
         return 1
+    if len(argv) >= 4 and argv[1] == "report":
+        positional, _, constraints = _report_inputs(argv[2:])
+        process, analysis = load_process(positional[0]), load_analysis(positional[1])
+        try:
+            check_analysis(analysis, process, constraints)
+            report = build_report(process, analysis, constraints)
+        except ValueError as exc:
+            print("The analysis does not fit this process or its constraints:\n" + str(exc)[:1500])
+            return 1
+        write_report(report)
+        print(f"Wrote {REPORT_MD} and {REPORT_JSON} (offline wording, no model involved).")
+        print(f"Status: {'PROVISIONAL' if report.provisional else 'FINAL'}; "
+              f"tier 1: {[p.stage_id for p in report.priorities if p.tier == 1]}")
+        return 0
+    if len(argv) >= 4 and argv[1] == "report-prompt":
+        positional, _, constraints = _report_inputs(argv[2:])
+        process, analysis = load_process(positional[0]), load_analysis(positional[1])
+        with open(REPORT_PROMPT_FILE, "w", encoding="utf-8") as fh:
+            fh.write(build_synth_system_prompt()
+                     + "\nNow write the wording for the facts below and reply with the JSON object only.\n\n"
+                     + build_synth_user_prompt(process, analysis, constraints))
+        print(f"Wrote {REPORT_PROMPT_FILE}. Paste its whole contents into a fresh Claude chat.")
+        return 0
+    if len(argv) >= 4 and argv[1] == "report-check":
+        positional, clipboard, constraints = _report_inputs(argv[2:])
+        process, analysis = load_process(positional[0]), load_analysis(positional[1])
+        if clipboard:
+            reply = read_clipboard()
+            with open(REPORT_REPLY_FILE, "w", encoding="utf-8") as fh:
+                fh.write(reply)
+        else:
+            reply = _read(positional[2] if len(positional) > 2 else REPORT_REPLY_FILE)
+        print(describe(reply) + "\n")
+        try:
+            narrative = parse_and_check_synthesis(reply, analysis, is_provisional(process))
+            report = build_report(process, analysis, constraints, narrative)
+        except ValueError as exc:
+            user = build_synth_user_prompt(process, analysis, constraints)
+            with open(REPORT_RETRY_FILE, "w", encoding="utf-8") as fh:
+                fh.write(build_synth_retry_prompt(user, reply, str(exc)))
+            print("INVALID:\n" + str(exc)[:1500])
+            print(f"\nWrote {REPORT_RETRY_FILE}. Paste it into the same chat, copy the new reply, and check again.")
+            return 1
+        write_report(report)
+        print(f"VALID. Wrote {REPORT_MD} and {REPORT_JSON} (model wording, checked against the data).")
+        return 0
     print("usage:\n  python -m drm.backend.bridge prompt <process_file>\n"
           "  python -m drm.backend.bridge check <process_file> [--clipboard | reply_file]\n"
           "  python -m drm.backend.bridge analysis-prompt <processmodel.json> [--oversight mandatory|recommended]\n"
-          "  python -m drm.backend.bridge analysis-check <processmodel.json> [--clipboard | reply_file] [--oversight ...]")
+          "  python -m drm.backend.bridge analysis-check <processmodel.json> [--clipboard | reply_file] [--oversight ...]\n"
+          "  python -m drm.backend.bridge report <processmodel.json> <analysis.json> [--oversight ...]   (offline, no model)\n"
+          "  python -m drm.backend.bridge report-prompt <processmodel.json> <analysis.json> [--oversight ...]\n"
+          "  python -m drm.backend.bridge report-check <processmodel.json> <analysis.json> [--clipboard | reply_file] [--oversight ...]")
     return 2
 
 
