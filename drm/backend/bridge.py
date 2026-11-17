@@ -134,17 +134,32 @@ def _report_inputs(args: list[str]):
     return positional, "--clipboard" in args, _constraints(args), opts
 
 
-def write_report(report, out_dir: str | None = None, name: str | None = None) -> str:
-    """Write <name>.md and <name>.json into out_dir (default: current folder). Returns the folder."""
+def write_report(report, out_dir: str | None = None, name: str | None = None) -> list[str]:
+    """Write <name>.md and <name>.json into out_dir (default: current folder).
+
+    Returns the full paths written, after checking that each file exists and is not empty."""
     import os
     folder = os.path.abspath(out_dir or ".")
     os.makedirs(folder, exist_ok=True)
     base = name or "drm_report"
-    with open(os.path.join(folder, base + ".json"), "w", encoding="utf-8") as fh:
-        fh.write(report.model_dump_json(indent=2))
-    with open(os.path.join(folder, base + ".md"), "w", encoding="utf-8") as fh:
-        fh.write(render_markdown(report))
-    return folder
+    paths = [os.path.join(folder, base + ".md"), os.path.join(folder, base + ".json")]
+    contents = [render_markdown(report), report.model_dump_json(indent=2)]
+    for path, text in zip(paths, contents):
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(text)
+        if not os.path.exists(path) or os.path.getsize(path) == 0:
+            raise RuntimeError(f"could not write {path}")
+    return paths
+
+
+def announce(paths: list[str], open_folder: bool, kind: str) -> None:
+    """Say exactly where the files are, and optionally open that folder."""
+    import os
+    print(f"{kind}. Files written:")
+    for path in paths:
+        print(f"  {path}  ({os.path.getsize(path)} bytes)")
+    if open_folder and hasattr(os, "startfile"):
+        os.startfile(os.path.dirname(paths[0]))
 
 
 def read_clipboard() -> str:
@@ -230,9 +245,8 @@ def main(argv: list[str]) -> int:
         except ValueError as exc:
             print("The analysis does not fit this process or its constraints:\n" + str(exc)[:1500])
             return 1
-        folder = write_report(report, opts["--out"], opts["--name"])
-        base = opts["--name"] or "drm_report"
-        print(f"Wrote {base}.md and {base}.json in {folder} (offline wording, no model involved).")
+        paths = write_report(report, opts["--out"], opts["--name"])
+        announce(paths, "--open" in argv, "Report built with offline wording (no model involved)")
         print(f"Status: {'PROVISIONAL' if report.provisional else 'FINAL'}; "
               f"tier 1: {[p.stage_id for p in report.priorities if p.tier == 1]}")
         return 0
@@ -266,15 +280,14 @@ def main(argv: list[str]) -> int:
             print("INVALID:\n" + str(exc)[:1500])
             print(f"\nWrote {REPORT_RETRY_FILE}. Paste it into the same chat, copy the new reply, and check again.")
             return 1
-        folder = write_report(report, opts["--out"], opts["--name"])
-        base = opts["--name"] or "drm_report"
-        print(f"VALID. Wrote {base}.md and {base}.json in {folder} (model wording, checked against the data).")
+        paths = write_report(report, opts["--out"], opts["--name"])
+        announce(paths, "--open" in argv, "VALID. Report built with model wording, checked against the data")
         return 0
     print("usage:\n  python -m drm.backend.bridge prompt <process_file>\n"
           "  python -m drm.backend.bridge check <process_file> [--clipboard | reply_file]\n"
           "  python -m drm.backend.bridge analysis-prompt <processmodel.json> [--oversight mandatory|recommended]\n"
           "  python -m drm.backend.bridge analysis-check <processmodel.json> [--clipboard | reply_file] [--oversight ...]\n"
-          "  python -m drm.backend.bridge report <processmodel.json> <analysis.json> [--oversight ...] [--out FOLDER] [--name BASE] [--note TEXT]   (offline, no model)\n"
+          "  python -m drm.backend.bridge report <processmodel.json> <analysis.json> [--oversight ...] [--out FOLDER] [--name BASE] [--note TEXT] [--open]   (offline, no model)\n"
           "  python -m drm.backend.bridge report-prompt <processmodel.json> <analysis.json> [--oversight ...]\n"
           "  python -m drm.backend.bridge report-check <processmodel.json> <analysis.json> [--clipboard | reply_file] [--oversight ...]")
     return 2
@@ -282,5 +295,3 @@ def main(argv: list[str]) -> int:
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
-
-
