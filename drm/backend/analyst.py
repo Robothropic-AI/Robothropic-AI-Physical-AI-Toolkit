@@ -99,6 +99,12 @@ Rules:
     is partial or reversible, not irreversible, and its severity reflects the cost of that recovery.
     Use irreversible only when the material, product or harm cannot be recovered.
 15. Use only the fields defined in the JSON Schema. Never add keys of your own, not even empty ones.
+16. In `interfaces`, name an interface only as the process model names it, or by its actual standard or
+    system (for example PLC data export, OPC UA). If the process model does not say which interface
+    exists, write one entry that begins "Not specified in the source." and then lists the options.
+    Never use hedged names such as "OPC-style" or "X-like".
+17. An assumption states one case. Never write "A or B" as an assumption. If the process model leaves a
+    choice open, state the single case you analysed, and set `confidence` as rule 4 requires.
 
 {ANCHORS}
 JSON Schema:

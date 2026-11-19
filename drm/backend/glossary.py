@@ -22,6 +22,8 @@ GLOSSARY: dict[str, str] = {
     "OCR": "Optical character recognition: software that reads printed or handwritten text from images.",
     "OPC": "A family of industrial standards for exchanging data between control equipment and software "
            "(originally 'OLE for Process Control').",
+    "OPC UA": "OPC Unified Architecture: the current, vendor-neutral OPC standard (IEC 62541) for reading data "
+              "from industrial equipment through one common interface.",
     "PLC": "Programmable logic controller: a rugged industrial computer that runs a machine's control "
            "sequences, such as opening shutters or holding a deposition rate.",
     "QA": "Quality assurance: the function that sets up and oversees quality systems and often makes the "
@@ -46,7 +48,16 @@ _TOKEN = re.compile(r"\b(?=[A-Za-z0-9]{2,8}\b)[A-Za-z0-9]*[A-Z][A-Za-z0-9]*[A-Z]
 
 
 def find_abbreviations(text: str) -> set[str]:
-    return {t for t in _TOKEN.findall(text) if t not in _NOT_ABBREVIATIONS}
+    """Abbreviations in `text`. Known multi-word terms (such as "OPC UA") are matched first, as one
+    term each, so their parts are not looked up or flagged separately."""
+    found: set[str] = set()
+    for phrase in sorted((k for k in GLOSSARY if " " in k), key=len, reverse=True):
+        pattern = re.compile(rf"\b{re.escape(phrase)}\b")
+        if pattern.search(text):
+            found.add(phrase)
+            text = pattern.sub(" ", text)
+    found |= {t for t in _TOKEN.findall(text) if t not in _NOT_ABBREVIATIONS}
+    return found
 
 
 def glossary_section(text: str) -> str:
