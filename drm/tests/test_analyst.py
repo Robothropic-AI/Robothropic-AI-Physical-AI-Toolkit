@@ -70,6 +70,12 @@ def test_prompt_asks_for_recovery_paths_and_forbids_extra_keys():
     assert "AFTER considering recovery paths" in p and "Never add keys of your own" in p
 
 
+def test_prompt_forbids_hedged_interface_names_and_either_or_assumptions():
+    p = analyst.build_analyst_system_prompt()
+    assert "Never use hedged names" in p and "Not specified in the source." in p
+    assert 'Never write "A or B" as an assumption' in p
+
+
 def test_user_prompt_includes_model_and_resolutions_only_when_approved():
     assert "<resolutions>" not in analyst.build_analyst_user_prompt(PROCESS)
     u = analyst.build_analyst_user_prompt(approved())

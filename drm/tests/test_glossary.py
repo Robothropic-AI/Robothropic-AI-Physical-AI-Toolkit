@@ -20,6 +20,18 @@ def test_glossary_lists_known_terms_sorted_and_flags_unknown_ones():
     assert "XYZQ" not in "".join(GLOSSARY)  # never guessed
 
 
+def test_multi_word_term_is_one_term_and_its_parts_are_not_flagged():
+    text = "Options: PLC data export, or an OPC UA server or gateway."
+    assert find_abbreviations(text) == {"PLC", "OPC UA"}
+    section = glossary_section(text)
+    assert "**OPC UA**" in section and "Terms to confirm" not in section
+
+
+def test_plain_opc_is_still_defined_on_its_own():
+    assert find_abbreviations("An OPC gateway") == {"OPC"}
+    assert "**OPC**" in glossary_section("An OPC gateway")
+
+
 def test_glossary_is_empty_without_abbreviations():
     assert glossary_section("plain words only") == ""
 
