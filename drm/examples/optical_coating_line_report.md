@@ -112,7 +112,7 @@ Tiers and order come from a deterministic formula (weights uncalibrated); tier 1
 
 **Integration:** effort 4/5, latency near_realtime, human check approve_before. Several systems and real-time data limits are involved. Read-only monitoring avoids safety-rated control, but data access and calibration are substantial. Because a missed deviation or a wrong abort is irreversible, any AI recommendation to continue or abort needs operator approval before action.
 - Data required: Quartz crystal monitor readings; Optical monitor spectra; PLC shutter and rate states; E-beam and ion-assist parameters; Historical runs with outcomes
-- Interfaces: PLC data export or OPC-style gateway (unspecified); Quartz and optical monitor outputs; Operator alert interface
+- Interfaces: Interface not specified in the source. Options: PLC data export, or an OPC UA server or gateway; Quartz and optical monitor outputs; Operator alert interface
 
 **Risks** (regulatory exposure 3/5: Run data may be needed for batch traceability, but the model names no regulation.)
 - A missed deviation allows a mis-thickness or contaminated coating to complete, losing the production run or letting a defect reach the customer. (severity 4/5, irreversible; not detectable before harm)
