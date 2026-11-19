@@ -80,3 +80,4 @@ def test_open_flag_opens_the_folder(tmp_path, monkeypatch):
     assert bridge.main(["bridge", "report", str(FIXTURE), "analysis.json", "--out", str(tmp_path / "o"), "--open"]) == 0
     assert opened == [str(tmp_path / "o")]
 
+
