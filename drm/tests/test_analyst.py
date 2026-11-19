@@ -160,3 +160,4 @@ def test_bridge_analysis_flow(monkeypatch, tmp_path, capsys):
     assert bridge.main(["bridge", "analysis-check", str(FIXTURE), "--clipboard", "--oversight", "mandatory"]) == 1
     assert "mandatory" in capsys.readouterr().out and os.path.exists("bridge_analysis_retry_prompt.txt")
 
+
