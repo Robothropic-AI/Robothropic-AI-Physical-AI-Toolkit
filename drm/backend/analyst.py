@@ -177,5 +177,3 @@ def analyse(process: ProcessModel | ApprovedProcessModel, constraints: Constrain
             last_error = str(exc)
             user = build_analyst_retry_prompt(process, raw, last_error)
     raise AnalysisError(f"no valid analysis after {max_retries + 1} attempts: {last_error[:500]}")
-
-
