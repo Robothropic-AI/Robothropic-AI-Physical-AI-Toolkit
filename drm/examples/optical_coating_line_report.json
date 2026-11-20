@@ -545,7 +545,7 @@
           "Historical runs with outcomes"
         ],
         "interfaces": [
-          "PLC data export or OPC-style gateway (unspecified)",
+          "Interface not specified in the source. Options: PLC data export, or an OPC UA server or gateway",
           "Quartz and optical monitor outputs",
           "Operator alert interface"
         ],
@@ -856,7 +856,7 @@
     "What happens to a run aborted by the operator in stage 6 (partial coating, rework, scrap)?",
     "Which records does the batch record contain, and in which system is it kept?"
   ],
-  "limitations": "- Scores are judgments made by a language model on anchored 1-5 scales, applied to a process description written by people. They are a structured starting point for review by a process engineer, not measurements.\n- The priority tiers come from a simple formula (fit minus effort minus worst-case severity, with a penalty for irreversible failures). Its weights are not calibrated against real deployments. It has no benefit term, so it ranks feasibility and risk and not value. It gives no credit for human oversight and ignores the analyst's confidence.\n- The analysis shows where AI could act. It does not size benefits, cost or schedule, and it does not validate any design.\n- Accountability for the process, the safety envelope, quality obligations and the decision to deploy stays with the process owner.\n- This analysis is PROVISIONAL: the process model has not been approved by a named person, and the open questions listed in this report remain to be resolved.\n- Human oversight constraint applied: mandatory.\n- Provenance: Analyst reply from a manual run; one stray empty field removed by hand.",
+  "limitations": "- Scores are judgments made by a language model on anchored 1-5 scales, applied to a process description written by people. They are a structured starting point for review by a process engineer, not measurements.\n- The priority tiers come from a simple formula (fit minus effort minus worst-case severity, with a penalty for irreversible failures). Its weights are not calibrated against real deployments. It has no benefit term, so it ranks feasibility and risk and not value. It gives no credit for human oversight and ignores the analyst's confidence.\n- The analysis shows where AI could act. It does not size benefits, cost or schedule, and it does not validate any design.\n- The analysis covers where an AI agent could act. It does not assess whether a stage suits classical automation or a robotic system, so \"AI role: none\" does not mean there is no automation opportunity.\n- Accountability for the process, the safety envelope, quality obligations and the decision to deploy stays with the process owner.\n- This analysis is PROVISIONAL: the process model has not been approved by a named person, and the open questions listed in this report remain to be resolved.\n- Human oversight constraint applied: mandatory.\n- Provenance: Analyst reply from a manual run; one stray empty field removed by hand; the stage 6 interface wording edited by hand (\"OPC-style gateway\" became \"an OPC UA server or gateway\").",
   "narrative_source": "offline"
 }
 
