@@ -73,6 +73,8 @@ def standard_limitations(constraints: Constraints, provisional: bool, provenance
         "oversight and ignores the analyst's confidence.",
         "- The analysis shows where AI could act. It does not size benefits, cost or schedule, and it does "
         "not validate any design.",
+        "- The analysis covers where an AI agent could act. It does not assess whether a stage suits classical "
+        "automation or a robotic system, so \"AI role: none\" does not mean there is no automation opportunity.",
         "- Accountability for the process, the safety envelope, quality obligations and the decision to "
         "deploy stays with the process owner.",
     ]
