@@ -1,6 +1,6 @@
 # DRM Code Guide 1 of 6: The map
 
-*Reading time about 15 minutes. Written for a technically literate reader who does not write Python daily.*
+*Reading time about 15 minutes.*
 
 ## The idea in four sentences
 
