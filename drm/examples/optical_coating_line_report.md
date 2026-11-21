@@ -6,7 +6,7 @@ Human oversight constraint: mandatory. Wording generated from the scores by plai
 
 ## Executive summary
 
-This is a provisional analysis of 'Anti-reflective coating of optical lenses, batch vacuum deposition line' covering 10 stages. Tier 1 starting points, by the ranking formula: 1 (Incoming inspection), 4 (Recipe selection). No appropriate AI role was found for: 7 (Venting and unloading). Low-confidence analyses, which depend on open questions: 5 (Chamber loading and pump-down), 6 (Deposition run), 8 (Optical QC), 10 (Disposition and records). Scores are model judgments for engineer review; see the limitations.
+This is a provisional analysis of 'Anti-reflective coating of optical lenses, batch vacuum deposition line' covering 10 stages. Tier 1 starting points, by the ranking formula: 1 (Incoming inspection), 4 (Recipe selection), 8 (Optical QC). No appropriate AI role was found for: 7 (Venting and unloading). Low-confidence analyses, which depend on open questions: 5 (Chamber loading and pump-down), 6 (Deposition run), 8 (Optical QC), 10 (Disposition and records). Scores are model judgments for engineer review; see the limitations.
 
 ## Priority map
 
@@ -16,180 +16,184 @@ How to read the columns: *Layer* says where an AI action would sit. *fast* means
 
 | Tier | Stage | AI role | Fit | Effort | Worst severity | Human check | Layer | Confidence | Why |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | 1. Incoming inspection | perception | 4 | 3 | 3 | review_after | fast | medium | Tier 1: fit 4/5, effort 3/5, worst-case severity 3/5 (partial), human check review_after, confidence medium. |
+| 1 | 1. Incoming inspection | perception | 4 | 3 | 3 | review_after | slow | medium | Tier 1: fit 4/5, effort 3/5, worst-case severity 3/5 (partial), human check review_after, confidence medium. |
 | 1 | 4. Recipe selection | reasoning | 4 | 2 | 4 | approve_before | slow | medium | Tier 1: fit 4/5, effort 2/5, worst-case severity 4/5 (partial), human check approve_before, confidence medium. |
-| 2 | 2. Ultrasonic cleaning | reasoning | 3 | 3 | 3 | approve_before | slow | medium | Tier 2: fit 3/5, effort 3/5, worst-case severity 3/5 (partial), human check approve_before, confidence medium. |
-| 2 | 3. Drying and fixturing | perception | 3 | 3 | 3 | review_after | slow | medium | Tier 2: fit 3/5, effort 3/5, worst-case severity 3/5 (partial), human check review_after, confidence medium. |
-| 2 | 5. Chamber loading and pump-down | perception | 3 | 3 | 3 | review_after | fast | low | Tier 2: fit 3/5, effort 3/5, worst-case severity 3/5 (partial), human check review_after, confidence low. |
-| 2 | 8. Optical QC | reasoning | 4 | 2 | 4 | approve_before | slow | low | Tier 2: fit 4/5, effort 2/5, worst-case severity 4/5 (irreversible), human check approve_before, confidence low. |
-| 3 | 9. Cosmetic inspection | perception | 4 | 3 | 4 | approve_before | slow | medium | Tier 3: fit 4/5, effort 3/5, worst-case severity 4/5 (irreversible), human check approve_before, confidence medium. |
-| 3 | 10. Disposition and records | reasoning | 3 | 3 | 4 | approve_before | slow | low | Tier 3: fit 3/5, effort 3/5, worst-case severity 4/5 (irreversible), human check approve_before, confidence low. |
-| 3 | 6. Deposition run | perception | 3 | 4 | 4 | approve_before | slow | low | Tier 3: fit 3/5, effort 4/5, worst-case severity 4/5 (irreversible), human check approve_before, confidence low. |
-| 3 | 7. Venting and unloading | none | 1 | 1 | 3 | human_only | human_only | medium | No AI role: Venting, cooling and unloading are physical handling steps with little decision content. Any AI role would be marginal, so none is appropriate. |
+| 1 | 8. Optical QC | reasoning | 4 | 2 | 4 | approve_before | slow | low | Tier 1: fit 4/5, effort 2/5, worst-case severity 4/5 (partial), human check approve_before, confidence low. |
+| 2 | 9. Cosmetic inspection | perception | 4 | 3 | 4 | approve_before | slow | medium | Tier 2: fit 4/5, effort 3/5, worst-case severity 4/5 (partial), human check approve_before, confidence medium. |
+| 3 | 2. Ultrasonic cleaning | reasoning | 3 | 3 | 3 | approve_before | slow | medium | Tier 3: fit 3/5, effort 3/5, worst-case severity 3/5 (partial), human check approve_before, confidence medium. |
+| 3 | 3. Drying and fixturing | perception | 3 | 3 | 3 | review_after | slow | medium | Tier 3: fit 3/5, effort 3/5, worst-case severity 3/5 (partial), human check review_after, confidence medium. |
+| 3 | 5. Chamber loading and pump-down | perception | 3 | 3 | 3 | review_after | slow | low | Tier 3: fit 3/5, effort 3/5, worst-case severity 3/5 (partial), human check review_after, confidence low. |
+| 3 | 6. Deposition run | perception | 3 | 4 | 4 | approve_before | slow | low | Tier 3: fit 3/5, effort 4/5, worst-case severity 4/5 (partial), human check approve_before, confidence low. |
+| 3 | 7. Venting and unloading | none | 1 | 1 | 3 | human_only | human_only | medium | No AI role: Venting, cooling and unloading are physical handling tasks with no meaningful AI role. At most, a vent and cool-down log could be captured, but that adds little value. |
+| 3 | 10. Disposition and records | reasoning | 3 | 3 | 4 | approve_before | slow | low | Tier 3: fit 3/5, effort 3/5, worst-case severity 4/5 (partial), human check approve_before, confidence low. |
 
 ## Stage details
 
 ### 1. Incoming inspection
 
-**AI role:** perception (also communication), fit 4/5. Camera-based defect detection for scratches, chips and contamination is well-defined and checkable. The operator keeps the accept/reject judgment and the AI drafts the log entry.
+**AI role:** perception (also communication), fit 4/5. Machine-vision inspection of substrates for scratches, chips and contamination is a well-defined, checkable perception task. The AI flags candidates and drafts the log entry while the operator confirms the disposition.
 
-**Integration:** effort 3/5, latency near_realtime, human check review_after. New imaging hardware and a labelled defect dataset must be collected. The log system is not named, so a lightweight record integration is needed.
-- Data required: Labelled images of substrate defects by type; Lot numbers; Defect acceptance criteria; Historical inspection findings
-- Interfaces: Inspection camera and lighting station; Lot log or record system (currently unspecified); Operator review screen
+**Integration:** effort 3/5, latency near_realtime, human check review_after. New data capture (cameras, lighting) is needed and a labelled defect dataset must be collected. The process model names no existing system, so the findings log would need a digital capture path.
+- Data required: Labelled images of acceptable and defective substrates (scratches, chips, contamination); Lot number; Operator findings log entries
+- Interfaces: Not specified in the source. Options: new camera and lighting station with image capture software; manual or digital entry into the lot findings log.
 
-**Risks** (regulatory exposure 2/5: General quality-system and record expectations for the lot log.)
-- A missed substrate defect (scratch or chip) passes into the line and is only discovered after coating, wasting a coating run on bad substrates. (severity 3/5, partial)
-- Over-rejection of acceptable substrates causes unnecessary scrap or delay. (severity 2/5, reversible)
+**Risks** (regulatory exposure 2/5: General quality-system and record expectations apply to the lot log. The process model names no specific regulation.)
+- AI misses a scratch or chip so a defective substrate proceeds into cleaning and coating. (severity 3/5, partial)
+- False positives cause good substrates to be held back, delaying the lot. (severity 1/5, reversible)
 
-**Assumptions:** Defect acceptance criteria exist and can be written down; Substrates can be imaged at the inspection point; The lot log is a paper or simple digital record
+**Assumptions:** Inspection is analysed as an AI-assisted camera station, with the operator reviewing flagged and sampled results after the fact.; The findings log is currently a manual or paper record because no system is named.
 
-*Layer: fast. Confidence: medium.*
+*Layer: slow. Confidence: medium.*
 
 ### 2. Ultrasonic cleaning
 
-**AI role:** reasoning (also communication), fit 3/5. AI could recommend the cleaning recipe from lot data and flag mismatches, while the operator does the physical loading and runs the line. Selection is a bounded sub-task.
+**AI role:** reasoning (also communication), fit 3/5. AI can suggest the cleaning recipe for the lot and check that recipe parameters match substrate type. Loading baskets and running the line remain physical operator tasks.
 
-**Integration:** effort 3/5, latency batch, human check approve_before. Recommendation is advisory, but reading line parameters needs one system integration whose interface is not stated.
-- Data required: Cleaning recipe library; Lot data and substrate type from stage 1; Cleaning line parameters and alarms; Past cleaning outcomes
-- Interfaces: Cleaning line controller or recipe selector (interface unknown); Lot record; Operator display
+**Integration:** effort 3/5, latency batch, human check approve_before. One system integration with the multi-tank line is needed, and the interface is unknown. Historical recipe and outcome data would have to be collected to support recommendations.
+- Data required: Cleaning recipe library; Lot and substrate type; Cleaning line run parameters and outcomes
+- Interfaces: Not specified in the source. Options: PLC data export from the cleaning line; manual recipe entry log.
 
-**Risks** (regulatory exposure 2/5: General quality-system and record expectations for recipe records.)
-- A wrong cleaning recipe recommendation that is not caught leaves contamination or damages substrates, causing coating adhesion or cosmetic failures found later. (severity 3/5, partial)
+**Risks** (regulatory exposure 2/5: General quality-system and record expectations apply to recipe selection records.)
+- Wrong cleaning recipe recommended and applied, leaving residue that causes coating adhesion failure or haze discovered later. (severity 3/5, partial)
 
-**Assumptions:** Cleaning recipes are stored digitally or can be digitised; The line exposes parameters through a PLC or export; Rework lots re-entering here may need a different recipe
+**Assumptions:** The AI role analysed is a recipe recommendation that the operator approves before the run.; The cleaning line has some digital recipe selection capability, which the process model does not confirm.
 
 *Layer: slow. Confidence: medium.*
 
 ### 3. Drying and fixturing
 
-**AI role:** perception (also communication), fit 3/5. A camera could verify fixture loading and capture substrate positions automatically for the record. Mounting in a laminar-flow area is manual work that stays with the operator.
+**AI role:** perception (also communication), fit 3/5. A camera could verify fixture loading and record substrate positions automatically, replacing manual position recording. Mounting in a laminar-flow area remains a manual, contamination-sensitive task.
 
-**Integration:** effort 3/5, latency near_realtime, human check review_after. New camera capture in a cleanliness-controlled area and a position-record integration are required.
-- Data required: Fixture and dome layout; Images of loaded fixture; Substrate-to-position mapping; Lot identifiers
-- Interfaces: Camera in or near the laminar-flow area; Position record system (unspecified); Operator confirmation screen
+**Integration:** effort 3/5, latency near_realtime, human check review_after. New camera capture in a clean area and labelled position data would be needed. Contamination control constrains where equipment can be placed.
+- Data required: Images of the loaded dome; Fixture position map; Substrate position record
+- Interfaces: Not specified in the source. Options: camera station in the laminar-flow area; manual entry into the position record.
 
-**Risks** (regulatory exposure 3/5: Position records support traceability and may be audited or customer-mandated.)
-- Incorrect position record misattributes substrates to dome positions, undermining traceability and later root-cause analysis. (severity 3/5, partial)
-- Added equipment or handling in the laminar-flow area introduces particulate contamination. (severity 3/5, partial; not detectable before harm)
+**Risks** (regulatory exposure 3/5: Position records support traceability, which may be a customer-mandated control. The process model names no specific regulation.)
+- Position record is wrong or lost, so a substrate cannot be traced to its location in the dome and its witness-sample correlation is unreliable. (severity 3/5, partial)
+- Camera equipment or handling introduces particulate contamination into the laminar-flow area. (severity 3/5, partial)
 
-**Assumptions:** Position recording is currently manual; Customers expect traceability from lot to dome position; Camera placement does not disturb laminar flow
+**Assumptions:** The AI role analysed is verification and automatic logging of positions, not mounting.; Position records are currently manual because no system is named.
 
 *Layer: slow. Confidence: medium.*
 
 ### 4. Recipe selection
 
-**AI role:** reasoning (also communication), fit 4/5. Matching a recipe from the library against the customer specification is digital and checkable. AI can propose and cross-check, while the process engineer remains accountable for confirmation.
+**AI role:** reasoning (also communication), fit 4/5. Matching customer specification to recipe library entries is a well-defined, checkable lookup and comparison task. The AI proposes the recipe and flags mismatches, while the process engineer accepts accountability for the choice.
 
-**Integration:** effort 2/5, latency batch, human check approve_before. Data is digital, but the recipe library and specification formats need extraction and cleaning.
-- Data required: Recipe library with layer materials, thicknesses and rates; Customer specifications; Recipe revision history; Lot and product mapping
-- Interfaces: Recipe library (system unspecified); Customer specification documents; Engineer approval interface
+**Integration:** effort 2/5, latency batch, human check approve_before. The data is likely already digital, though the library format and specification format are not stated. Some cleaning of specification text is expected.
+- Data required: Recipe library (materials, thicknesses, deposition rates); Customer specification; Substrate material and geometry; Historical run outcomes per recipe
+- Interfaces: Not specified in the source. Options: export or API from the recipe library; document or PDF parsing of the customer specification.
 
-**Risks** (regulatory exposure 3/5: Customer-mandated controls and recipe traceability are likely, but no regulation is named in the model.)
-- A wrong or outdated recipe is confirmed against the specification, so a full run is coated incorrectly and defective lenses may reach the customer. (severity 4/5, partial)
-- Misreading the customer specification leads to a mismatch that is detected only at optical QC. (severity 3/5, partial)
+**Risks** (regulatory exposure 3/5: Recipe confirmation against the customer specification is a customer-mandated control and its record is likely audited.)
+- Wrong recipe is recommended and approved, so the entire lot is coated to the wrong specification and the run is lost. (severity 4/5, partial)
+- Customer specification is misread or outdated, leading to a recipe that does not meet the actual requirement. (severity 4/5, partial)
 
-**Assumptions:** Specifications are available as text or structured documents; Recipe library has version control; The ambiguity on how many confirmations occur before deposition is unresolved
+**Assumptions:** The recipe library is digital and accessible, although the process model names no system for it.; A wrongly coated lot can be stripped and recoated through the declared rework path from stage 10, so the failure is partial rather than irreversible.
 
 *Layer: slow. Confidence: medium.*
 
 ### 5. Chamber loading and pump-down
 
-**AI role:** perception (also communication), fit 3/5. AI could monitor pump-down curves, flag leaks or abnormal pumping behaviour and predict time to base pressure. Loading the dome and starting pump-down remain manual.
+**AI role:** perception (also communication), fit 3/5. AI can monitor the pump-down curve for anomalies such as leaks or slow pumping and alert the operator. Loading the dome and starting pump-down stay with the operator.
 
-**Integration:** effort 3/5, latency near_realtime, human check review_after. Read-only data capture from the pumping system is one integration. No control authority is assumed.
-- Data required: Pressure and pump-down history; Pump and valve status; Base pressure target; Past pump-down curves for baselining
-- Interfaces: Vacuum gauge and pumping system data (PLC or historian); Read-only monitoring dashboard; Operator alerts
+**Integration:** effort 3/5, latency near_realtime, human check review_after. One system integration to read pressure and pump data is needed. The base pressure target and who confirms it are unresolved in the process model.
+- Data required: Chamber pressure time series; Pumping system status; Base pressure target; Historical pump-down curves
+- Interfaces: Not specified in the source. Options: PLC data export; OPC UA; pressure gauge analog or serial output.
 
-**Risks** (regulatory exposure 2/5: General quality-system and record expectations.)
-- A missed leak or abnormal pump-down signal lets a run start with poor vacuum, degrading coating quality across the lot. (severity 3/5, partial)
-- Nuisance alerts delay the process and cause alarm fatigue. (severity 1/5, reversible)
+**Risks** (regulatory exposure 2/5: General quality-system and record expectations apply to process parameters.)
+- Anomaly such as a leak or outgassing goes undetected and the run starts at inadequate vacuum, degrading coating adhesion and optical performance. (severity 3/5, partial)
+- False alarms delay pump-down confirmation and reduce throughput. (severity 1/5, reversible)
 
-**Assumptions:** Pressure data is available electronically; Base pressure target is defined, though the model leaves it unspecified; AI role is advisory only, with no control of valves or pumps
+**Assumptions:** The AI role analysed is read-only monitoring and alerting with no control of the pumping system.; Pressure data is accessible digitally from the vacuum system, which the process model does not confirm.
 
-*Layer: fast. Confidence: low.*
+*Layer: slow. Confidence: low.*
 
 ### 6. Deposition run
 
-**AI role:** perception (also reasoning, communication), fit 3/5. AI could watch rate, thickness and optical monitor signals for drift or deviation and alert the operator. Control and abort authority stay with the PLC and operator.
+**AI role:** perception (also reasoning, communication), fit 3/5. AI can monitor rate, thickness and ion assist signals to detect drift and advise the operator to abort. Control stays with the PLC and the operator because of hard-real-time dynamics and the cost of an incorrect action.
 
-**Integration:** effort 4/5, latency near_realtime, human check approve_before. Several systems and real-time data limits are involved. Read-only monitoring avoids safety-rated control, but data access and calibration are substantial. Because a missed deviation or a wrong abort is irreversible, any AI recommendation to continue or abort needs operator approval before action.
-- Data required: Quartz crystal monitor readings; Optical monitor spectra; PLC shutter and rate states; E-beam and ion-assist parameters; Historical runs with outcomes
-- Interfaces: Interface not specified in the source. Options: PLC data export, or an OPC UA server or gateway; Quartz and optical monitor outputs; Operator alert interface
+**Integration:** effort 4/5, latency near_realtime, human check approve_before. Several systems must be read in near real time and data must be time-aligned and calibrated. Any action on the process would involve physical integration and safety review, so the analysis assumes advisory use only.
+- Data required: PLC shutter and rate data; Quartz crystal monitor thickness and rate; Optical monitor signals; E-beam and ion assist parameters; Recipe layer sequence; Historical run data with QC outcomes
+- Interfaces: PLC; Quartz crystal monitor; Optical monitor; Not specified in the source. Options: PLC data export; OPC UA for data readout.
 
-**Risks** (regulatory exposure 3/5: Run data may be needed for batch traceability, but the model names no regulation.)
-- A missed deviation allows a mis-thickness or contaminated coating to complete, losing the production run or letting a defect reach the customer. (severity 4/5, irreversible; not detectable before harm)
-- A false alarm prompts an unnecessary operator abort and wastes a run. (severity 4/5, irreversible)
+**Risks** (regulatory exposure 3/5: Process records for the deposition run support traceability and may be customer-mandated.)
+- AI fails to flag a deposition deviation, so the run completes out of specification and a coated lot is lost or defective. (severity 4/5, partial; not detectable before harm)
+- AI advises an unwarranted abort, wasting a run partway through the layer sequence and leaving partially coated substrates. (severity 3/5, partial)
+- A defective lot passes later checks and reaches the customer. (severity 4/5, partial)
 
-**Assumptions:** PLC and monitors can export data at useful rates; AI has no write access to the PLC, shutters or e-beam; Handling of aborted runs is unresolved in the model
+**Assumptions:** The AI role analysed is advisory monitoring only, with no direct control of the PLC, shutters or e-beam.; Process data is accessible from the PLC and monitors in digital form, which the process model does not confirm.; Failed coatings can be stripped and recoated via the rework path in stage 10, so failures are partial rather than irreversible.
 
 *Layer: slow. Confidence: low.*
 
 ### 7. Venting and unloading
 
-**AI role:** none, fit 1/5. Venting, cooling and unloading are physical handling steps with little decision content. Any AI role would be marginal, so none is appropriate.
+**AI role:** none, fit 1/5. Venting, cooling and unloading are physical handling tasks with no meaningful AI role. At most, a vent and cool-down log could be captured, but that adds little value.
 
-**Integration:** effort 1/5, latency batch, human check human_only. No AI integration is proposed. Chamber data could be logged but the stage adds little value.
+**Integration:** effort 1/5, latency batch, human check human_only. No AI integration is proposed. Any status logging would use existing data if available.
+- Data required: Chamber vent and temperature status
+- Interfaces: Not specified in the source. Options: PLC data export; manual log.
 
 **Risks** (regulatory exposure 1/5)
-- Mishandling during unloading chips or scratches coated lenses, or venting too early thermally shocks substrates. (severity 3/5, irreversible; not detectable before harm)
+- Substrates are unloaded before sufficient cooling or handled carelessly, causing thermal stress, damage or contamination of coated surfaces. (severity 3/5, partial)
 
-**Assumptions:** Venting is a standard automated or manual chamber sequence; Cooling criteria are fixed by procedure
+**Assumptions:** No records are kept at this stage, as the process model lists none.
 
 *Layer: human_only. Confidence: medium.*
 
 ### 8. Optical QC
 
-**AI role:** reasoning (also perception, communication), fit 4/5. Spectrophotometer data is digital, and comparing reflectance against a specification is well-defined and checkable. AI can compute pass or fail and flag borderline results for a person to confirm.
+**AI role:** reasoning (also perception, communication), fit 4/5. Comparing digital spectrophotometer reflectance data to the specification is well-defined and checkable. AI can compute the comparison, flag marginal results and draft the pass or fail result for human confirmation.
 
-**Integration:** effort 2/5, latency batch, human check approve_before. Instrument output is digital and an export likely exists. Linking witness samples to runs is unresolved and may need new data capture.
-- Data required: Spectrophotometer reflectance measurements; Reflectance specification limits; Witness sample identity and run linkage; Historical measurements
-- Interfaces: Spectrophotometer data export or API; Specification record; QC reviewer interface
+**Integration:** effort 2/5, latency batch, human check approve_before. Measurement data is already digital and an export is likely available. Effort is mainly data cleaning and linking witness samples to runs, which the process model leaves unresolved.
+- Data required: Spectrophotometer reflectance spectra; Reflectance specification; Witness sample identity and run linkage; Historical QC results
+- Interfaces: Spectrophotometer; Not specified in the source. Options: instrument data export (CSV or file output); vendor API.
 
-**Risks** (regulatory exposure 3/5: Customer-mandated QC records and traceability are likely; no regulation is named.)
-- A false pass on out-of-specification reflectance releases defective lenses to the customer. (severity 4/5, irreversible)
-- A false fail sends good lots to rework or scrap, costing time and material. (severity 3/5, partial)
+**Risks** (regulatory exposure 3/5: Pass or fail decisions against the customer specification are likely a customer-mandated control with audited records.)
+- AI wrongly passes an out-of-specification lot, so a defective lot proceeds toward release and may reach the customer. (severity 4/5, partial)
+- AI wrongly fails a conforming lot, sending it unnecessarily to rework or scrap. (severity 3/5, partial)
+- Witness samples are not representative of the lot or are mislinked, giving a misleading result. (severity 4/5, partial; not detectable before harm)
 
-**Assumptions:** The model names no actor for this stage, so a QC technician or engineer is assumed to supervise; Witness samples are linked to the lot, though the origin of witness samples is unresolved; Measurement is already digital
+**Assumptions:** The AI role analysed is computing and proposing the pass or fail result, which a human approves before it takes effect.; Witness samples come from the deposition run and are traceable to the lot, although the process model leaves their origin open.; The performer of the QC measurement is unknown, as the process model lists no actor.
 
 *Layer: slow. Confidence: low.*
 
 ### 9. Cosmetic inspection
 
-**AI role:** perception (also communication), fit 4/5. Machine vision under controlled lighting can detect pinholes, haze and stains and assist the operator. Findings are visual and checkable, but defect criteria need to be collected.
+**AI role:** perception (also communication), fit 4/5. Machine-vision detection of pinholes, haze and stains under controlled lighting is a well-defined, checkable perception task. The AI flags defects and the operator reviews and decides.
 
-**Integration:** effort 3/5, latency near_realtime, human check approve_before. New imaging hardware, controlled lighting and labelled data collection are required. Haze and stains can be hard to image reliably. Because a missed defect reaching the customer is irreversible, the operator approves each accept decision before lenses move on.
-- Data required: Labelled images of pinholes, haze and stains; Cosmetic acceptance criteria; Lens identifiers; Operator disposition on flagged items
-- Interfaces: Imaging station replacing or augmenting the inspection lamp; Findings record; Operator review screen
+**Integration:** effort 3/5, latency near_realtime, human check approve_before. New camera capture and controlled illumination must be built around or in place of the inspection lamp. Labelled defect data must be collected, and haze detection on coated optics can be difficult.
+- Data required: Labelled images of pinholes, haze and stains; Lens identity and lot number; Operator findings
+- Interfaces: Inspection lamp; Not specified in the source. Options: new camera and lighting station with image capture software; manual findings log.
 
-**Risks** (regulatory exposure 2/5: General quality-system and record expectations; customer cosmetic standards may apply.)
-- A missed cosmetic defect on a coated lens reaches the customer. (severity 4/5, irreversible)
-- Over-flagging increases rework or scrap and slows throughput. (severity 2/5, reversible)
+**Risks** (regulatory exposure 3/5: Cosmetic acceptance is typically a customer-mandated control and its records are likely audited.)
+- AI misses a cosmetic defect such as haze or a pinhole, so a defective lens is released and reaches the customer. (severity 4/5, partial)
+- AI over-rejects good lenses, causing unnecessary rework or scrap. (severity 2/5, partial)
 
-**Assumptions:** Cosmetic criteria are defined, though the model does not specify them; Whether a cosmetic failure triggers rework or scrap is unresolved; The 4 rating assumes the human gives the final accept on AI findings
+**Assumptions:** Inspection is analysed as an AI-assisted camera station with the operator approving results before they take effect.; The process model does not say whether a cosmetic failure triggers rework or scrap, so only the detection step is analysed.
 
 *Layer: slow. Confidence: medium.*
 
 ### 10. Disposition and records
 
-**AI role:** reasoning (also communication), fit 3/5. AI can compile QC results into the batch record, check completeness and recommend release, rework or scrap. The decision and accountability for release stay with a person.
+**AI role:** reasoning (also communication), fit 3/5. AI can consolidate QC results, propose a release, rework or scrap recommendation and draft the batch record. The accountable disposition decision stays with a person.
 
-**Integration:** effort 3/5, latency batch, human check approve_before. Several records must be consolidated into the batch record, whose system is not named. The disposition decision and its criteria are unresolved.
-- Data required: Optical QC result; Cosmetic inspection findings; Lot and run records; Rework history and scrap criteria; Batch record template
-- Interfaces: Batch record system (unspecified); QC and inspection data sources; Quality engineer approval interface
+**Integration:** effort 3/5, latency batch, human check approve_before. Data from several upstream stages must be consolidated, and the system holding the batch record is not named. The rework-versus-scrap criteria and the decision owner are unresolved in the process model.
+- Data required: Optical QC result; Cosmetic inspection findings; Lot identity and history; Rework and scrap criteria; Batch record contents
+- Interfaces: Not specified in the source. Options: export or API from the system holding the batch record; manual or paper batch record.
 
-**Risks** (regulatory exposure 3/5: The batch record is kept for traceability, which suggests audited records or customer-mandated controls; no regulation is named.)
-- Wrongly releasing a failing lot sends defective lenses to the customer. (severity 4/5, irreversible)
-- Incomplete or incorrect batch record breaks traceability for audit or complaint investigation. (severity 3/5, partial)
-- Wrong rework versus scrap choice wastes a recoverable lot or sends an unrecoverable lot through strip and recoat. (severity 3/5, partial)
+**Risks** (regulatory exposure 3/5: The batch record is completed for traceability, which indicates audited records or customer-mandated controls. The process model names no specific regulation.)
+- A failing lot is wrongly released to packing and reaches the customer. (severity 4/5, partial)
+- A recoverable lot is scrapped when rework would have succeeded, or an unrecoverable lot is reworked, wasting cost. (severity 3/5, irreversible)
+- Batch record is incomplete or incorrect, breaking traceability for the lot. (severity 3/5, partial)
 
-**Assumptions:** The model names no actor, so a quality engineer is assumed to be accountable; Rework and scrap criteria are unresolved; Rework path returns to stage 2 as stated
+**Assumptions:** The AI role analysed is recommending a disposition and drafting the batch record for human approval.; The decision owner for rework versus scrap is unknown, as the process model lists no actor.; The scrap failure mode is marked irreversible because scrapped material cannot be recovered, while the rework path recovers lots that are sent back to stage 2.
 
 *Layer: slow. Confidence: low.*
 
 ## Cross-cutting risks
 
 - Severe failure modes (severity 4 or more) occur at stages 4 (Recipe selection), 6 (Deposition run), 8 (Optical QC), 9 (Cosmetic inspection), 10 (Disposition and records); a human check is needed before AI output takes effect there.
-- Audited records or customer-mandated controls (regulatory exposure 3 or more) apply at stages 3 (Drying and fixturing), 4 (Recipe selection), 6 (Deposition run), 8 (Optical QC), 10 (Disposition and records).
+- Audited records or customer-mandated controls (regulatory exposure 3 or more) apply at stages 3 (Drying and fixturing), 4 (Recipe selection), 6 (Deposition run), 8 (Optical QC), 9 (Cosmetic inspection), 10 (Disposition and records).
 - Stages 5 (Chamber loading and pump-down), 6 (Deposition run), 8 (Optical QC), 10 (Disposition and records) rest on unresolved questions, so their scores may change.
 
 ## Open questions for the partner
@@ -214,7 +218,7 @@ How to read the columns: *Layer* says where an AI action would sit. *fast* means
 - Accountability for the process, the safety envelope, quality obligations and the decision to deploy stays with the process owner.
 - This analysis is PROVISIONAL: the process model has not been approved by a named person, and the open questions listed in this report remain to be resolved.
 - Human oversight constraint applied: mandatory.
-- Provenance: Analyst reply from a manual run; one stray empty field removed by hand; the stage 6 interface wording edited by hand ("OPC-style gateway" became "an OPC UA server or gateway").
+- Provenance: Analyst scores: genuine Claude Sonnet 5.5 (medium effort) reply via the manual bridge, 21 Nov 2026, no hand edits. Process model hand-authored.
 
 ## Glossary
 
@@ -222,11 +226,16 @@ General definitions of the abbreviations used in this report. A plant may use so
 
 - **AI**: Artificial intelligence: software that performs tasks that normally need human judgment, such as recognising defects in images or recommending a setting.
 - **API**: Application programming interface: a defined way for one software system to request data from, or send data to, another.
-- **OPC**: A family of industrial standards for exchanging data between control equipment and software (originally 'OLE for Process Control').
 - **OPC UA**: OPC Unified Architecture: the current, vendor-neutral OPC standard (IEC 62541) for reading data from industrial equipment through one common interface.
 - **PLC**: Programmable logic controller: a rugged industrial computer that runs a machine's control sequences, such as opening shutters or holding a deposition rate.
 - **QC**: Quality control: checks that a product or batch meets its specification, such as measuring or inspecting samples.
 
+### Terms to confirm
+
+These abbreviations appear in the report but have no standard definition on file. Confirm their meaning with the process owner:
+
+- CSV
+- PDF
+
 ---
 *Generated by the Robothropic AI Deployment Readiness Mapper.*
-
