@@ -115,6 +115,27 @@ ProcessModel(process_name="p", stages=[s(1, [2]), s(2, [1])])
 ```
 Expected: `depends_on contains a cycle; declare loop-backs with rework_to`.
 
+## Reading the output (from a real run on Windows)
+
+Each failed experiment prints a block that looks like a crash. It is not. It is the schema doing its job. This is how to read it, using experiment A:
+
+```
+Traceback (most recent call last):                          <- Python's standard heading; ignore
+  File "<python-input-1>", line 1, in <module>              <- the line you typed
+  File ".venv\Lib\site-packages\pydantic\main.py", line 280 <- the library's internal path; ignore
+pydantic_core._pydantic_core.ValidationError: 1 validation error for Stage     <- THE RESULT: a Stage was refused
+  Value error, stage 1: 'probably the operator' hedges inside a name;          <- THE RULE, written in process.py
+  put inferences in assumptions or ambiguities
+  [type=value_error, input_value=...]                       <- technical detail of what was submitted
+  For further information visit https://errors.pydantic.dev/...   <- a documentation link; ignore
+```
+
+The useful part is always the lines after `ValidationError`. For experiment B they are the field name `colour`, then `Extra inputs are not permitted`. For experiment C they are `depends_on contains a cycle; declare loop-backs with rework_to`.
+
+Two things follow from a refusal. No object is created, so the bad data never enters the pipeline. And the same message is what a model receives in the retry prompt, which tells it exactly what to fix.
+
+**Positive control:** remove the offending part and run the same line again. For A, use `actors=["the operator"]`. The stage is built without error and Python prints it. Only one word changed, and the rule is the only reason the outcome changed.
+
 ## Check yourself
 
 1. Why are the scores integers from 1 to 5? *(A model cannot justify a percentage. The levels have defined meanings in the Analyst prompt.)*
@@ -122,4 +143,3 @@ Expected: `depends_on contains a cycle; declare loop-backs with rework_to`.
 3. `human_only` appears in two lists. What is the difference? *(One says who checks; the other says where the AI action sits, and here there is none.)*
 4. Which two checks on the Analyst's reply are not in the schemas? *(That every stage is covered, and the mandatory-oversight rule. Both are in `analyst.check_analysis`.)*
 
-5. 
