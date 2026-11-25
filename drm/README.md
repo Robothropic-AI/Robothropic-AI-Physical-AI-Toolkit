@@ -48,7 +48,7 @@ The questions come from the Decomposer, so approval is a second run:
 
 - `optical_coating_line.md`: an illustrative 10-stage anti-reflective coating line with human operators and no AI in it.
 - `optical_coating_line.processmodel.json`: the reference process model. **Hand-authored**, not model output.
-- `optical_coating_line.analysis.json` and `optical_coating_line_report.md/.json`: the Analyst scores come from a manual run through a chat window, with one stray empty field and one interface wording edited by hand (recorded in the report's provenance line). The wording of the report is generated from templates.
+- `optical_coating_line.analysis.json` and `optical_coating_line_report.md/.json`: the Analyst scores are the genuine reply of Claude Sonnet 5.5 (medium effort), obtained by a manual run through a chat window on 21 November 2026. The JSON is reformatted for readability; the content is not edited. The wording of the report is generated from templates, and the report's provenance line says so.
 - `adhesive_batch_line.md` and `.processmodel.json`: a deliberately messy input with an instruction planted in stage 8. The process model is a genuine model reply, formatting only.
 
 ## Tests
@@ -59,21 +59,29 @@ python -m pytest drm/tests -q
 
 The tests use stand-in clients: no key and no network. They cover the schemas, the checks on each agent's output, the scoring, the report, the glossary and the pipeline code.
 
+## Code guides
+
+`drm/docs/` holds four reading guides: `drm_code_guide_1.md` (the map), `drm_code_guide_2.md` (the schemas), `drm_code_guide_3.md` (the Decomposer and the Analyst) and `drm_code_guide_4.md` (ranking and report assembly).
+
 ## Status and limitations
 
 State of the evidence:
 
 - The one-command pipeline is tested with stand-in clients. **It has not yet been run against the live API.**
 - The Decomposer produced valid output on both examples through a chat window. One sample per input; variance is not measured.
-- The Analyst was run by hand on the optical line. A first attempt failed two engineering checks and was retried. A reviewer judged one rating too high. The prompt was changed afterwards and the full chain has not been re-run with it.
+- The Analyst was run by hand on the optical line with human oversight set to mandatory. The first run was rejected by an engineering check and, after one stray empty field was removed by hand, accepted; a reviewer judged one rating too high. The prompt was changed afterwards. A re-run (one sample) was valid on the first attempt with no hand edits. The ranking moved between the two runs (tier 1 grew from stages 1 and 4 to stages 1, 4 and 8). With one sample per run, the cause cannot be isolated.
+- The optical line is illustrative: no plant data stands behind it, and its process model is hand-authored.
 - The FastAPI layer and the frontend are not built.
 
 Limits of the method:
 
 - Scores are judgments made by a language model on anchored scales, applied to a description written by people. They are a starting point for review, not measurements.
 - The priority formula (fit minus effort minus worst-case severity, with a penalty for irreversible failures) has uncalibrated weights. It has no benefit term, gives no credit for human oversight, and ignores the analyst's confidence. It ranks feasibility and risk, not value.
+- Reversibility ratings can rest on facts the process model does not state. Whether a badly coated lot can be stripped and recoated depends on the substrate, the coating, a topcoat and the economics. Reversibility also has no stated scope (a whole lot or a single lens), so one failure mode can mix consequences that differ in reversibility. The rating of unloading damage as partial is known to be too generous.
+- The schema rule that forces a human to approve before the action applies to severity 4 and 5. An irreversible failure of severity 3 is not covered by it.
 - The DRM scores where an AI agent could act. It does not assess whether a stage suits classical automation or a robotic system. "AI role: none" does not mean there is no automation opportunity.
 - Accountability for the process, the safety envelope, quality obligations and the decision to deploy stays with the process owner.
 
 Licence: Apache 2.0.
+
 
