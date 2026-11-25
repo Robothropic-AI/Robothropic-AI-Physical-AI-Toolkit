@@ -4,7 +4,7 @@
 **Agentic AI as the cognitive and planning layer for physical robots. From factory floors to planetary surfaces.**
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Stack: FastAPI + Pydantic v2](https://img.shields.io/badge/Stack-FastAPI%20%2B%20Pydantic%20v2-green.svg)](https://fastapi.tiangolo.com)
+[![Stack: Python + Pydantic v2](https://img.shields.io/badge/Stack-Python%20%2B%20Pydantic%20v2-green.svg)](https://docs.pydantic.dev)
 [![LLM: Claude API](https://img.shields.io/badge/LLM-Claude%20API-orange.svg)](https://www.anthropic.com)
 [![Publication: Robothropic AI on Substack](https://img.shields.io/badge/Publication-Substack-red.svg)](https://robothropicai.substack.com)
 
@@ -14,7 +14,7 @@
 
 **Robothropic AI** is an agentic AI robotics platform — open-source software infrastructure for physical AI systems across all robot form factors and deployment environments: industrial automation, advanced manufacturing, space operations, and beyond.
 
-This repository is the engineering complement to the [Robothropic AI publication](https://robothropicai.substack.com). Every build here has a companion analytical article. Every article has working code.
+This repository is the engineering complement to the [Robothropic AI publication](https://robothropicai.substack.com). Every build here has a companion analytical article, and every build ships with its tests.
 
 The thesis is precise: **the agentic loop — perceive, reason, act, observe, repeat — is the foundational software architecture for physical AI at every scale.** The parameters change across robot bodies and environments. The architectural pattern does not.
 
@@ -56,34 +56,37 @@ AI for throughput. Human expert for accountability.
 
 ## Repository Structure
 
+What is in the repository today:
+
 ```
-physical-ai-toolkit/
+Robothropic-AI-Physical-AI-Toolkit/
 │
 ├── README.md
+├── requirements.txt
+├── LICENSE                       # Apache 2.0
 │
-├── /drm                          # Deployment Readiness Mapper (v1 — July 2026)
-│   ├── README.md                 # DRM architecture and usage
-│   ├── /backend                  # FastAPI + Pydantic v2 pipeline
-│   │   ├── decomposer.py         # Stage 1: workflow decomposition agent
-│   │   ├── analyst.py            # Stage 2: per-stage analysis agent
-│   │   ├── synthesizer.py        # Stage 3: report synthesis agent
-│   │   └── main.py               # FastAPI entry point
-│   ├── /frontend                 # React / TypeScript UI
-│   └── /schemas                  # Pydantic output models
-│
-├── /signals                      # Robothropic Signal — rapid demos
-│   └── /[signal-slug]/           # One folder per Signal post
-│       ├── README.md             # What this demonstrates + Substack link
-│       └── demo.py               # Self-contained script or notebook
-│
-└── /notebooks                    # Jupyter notebooks for analytical pieces
+└── /drm                          # Deployment Readiness Mapper (command-line release)
+    ├── README.md                 # usage, approval, evidence, limitations
+    ├── /schemas                  # Pydantic models and the rules they enforce
+    ├── /backend                  # decomposer, analyst, synthesizer, scoring, render,
+    │                             #   glossary, pipeline, bridge, config
+    ├── /tests                    # 86 tests; stand-in clients, no key, no network
+    ├── /examples                 # worked inputs and outputs
+    └── /docs                     # code guides 1 to 4
 ```
+
+Planned, not yet in the repository:
+
+- `/drm`: an API layer (FastAPI) and a frontend (React / TypeScript)
+- `/signals`: one folder per Robothropic Signal post that has code
+- `/lectures`: one folder per Robothropic Lecture with a code prototype (`/lectures/[NN-slug]/`)
+- `/notebooks`: Jupyter notebooks for analytical pieces
 
 ---
 
 ## Current Build: Deployment Readiness Mapper (DRM)
 
-**Status**: In active development — release is quality-gated
+**Status**: command-line release. The API layer and the frontend are planned, not built. Nothing has yet been run against the live API; see "What has been run" below.
 
 The DRM is a three-agent pipeline that takes a structured description of an industrial or physical AI process and returns a structured analysis across three dimensions:
 
@@ -99,41 +102,62 @@ The DRM is a three-agent pipeline that takes a structured description of an indu
 Structured process input (numbered stages)
         │
         ▼
-[ Decomposer Agent ]  →  parse stages, actors, data flows, dependencies
+[ Decomposer Agent ]  →  parse stages, actors, systems, records, dependencies, open questions
         │
         ▼
-[ Analyst Agent ]     →  score each stage across all three dimensions (parallelisable)
+[ Analyst Agent ]     →  score each stage across all three dimensions (one call for the whole process)
         │
         ▼
-[ Synthesizer Agent ] →  executive summary + per-stage breakdown + priority map
+[ Synthesizer Agent ] →  priority map and tiers (computed in code) + report wording
         │
         ▼
 Output: structured JSON + human-readable Markdown report
 ```
 
+Every model reply is validated against strict schemas and retried on failure. Ranking, tiers, the limitations text and the PROVISIONAL flag are computed in code, not written by a model.
+
+### What has been run
+
+- 86 tests pass. They use stand-in clients: no key and no network.
+- The model calls so far were made by hand through the Claude app, using the manual bridge. The one-command pipeline has not been run against the live API.
+- The worked example (an anti-reflective coating line) is illustrative, with no plant data behind it.
+
+The evidence and the limits are stated in [`drm/README.md`](drm/README.md) and in Post 05 of the publication.
+
 ### Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| LLM | Claude API (`claude-sonnet-4`) |
-| Backend | FastAPI + Pydantic v2 |
-| Frontend | React + TypeScript |
+| LLM | Claude API (`claude-sonnet-5-5`, set in `drm/backend/config.py`) |
+| Backend | Python, Pydantic v2 (FastAPI layer planned) |
+| Frontend | Planned: React + TypeScript |
 | Output | Structured JSON + Markdown |
 | License | Apache 2.0 |
+
+### Quick start
+
+Tested on Python 3.12 and 3.14.
+
+```
+pip install -r requirements.txt
+python -m pytest drm/tests -q
+```
+
+Usage, the approval step and the manual bridge are in [`drm/README.md`](drm/README.md).
 
 The DRM is the first module. Subsequent modules extend the toolkit as the platform grows.
 
 ---
 
-## Robothropic Signal
+## Robothropic Signal (planned)
 
-Alongside the main builds, this repository hosts rapid demos triggered by notable papers, deployments, or field developments — the engineering complement to the [Robothropic Signal](https://robothropicai.substack.com) posts.
+Alongside the main builds, Signals will be fast posts triggered by a notable paper, deployment or field development, and a way to look for real engineering examples to bring into the toolkit. A Signal that comes with code will live in `/signals/[slug]/` with a short README that links to the companion article. A Signal ships when its insight is ready, not on a fixed schedule.
 
-Each Signal demo is:
-- Self-contained in its own `/signals/[slug]/` folder
-- Runnable with minimal setup
-- Linked to the companion Substack article
-- Shipped the same day the insight appears
+---
+
+## Robothropic Lecture (planned)
+
+A Lecture is an in-depth article on one research paper or development in robotics and physical AI, with a minimal code prototype where it fits, in `/lectures/[NN-slug]/`. A webcast explainer is planned for each Lecture; the platform and format are not decided. Lectures start after the Founding Series ends, and a Lecture ships when its code runs and its analysis is sound.
 
 ---
 
@@ -145,18 +169,6 @@ This toolkit is domain-agnostic at the architecture level. Current and planned a
 - **Space Operations**: planetary exploration, on-orbit systems, autonomous navigation
 - **Advanced Manufacturing**: quality inspection, assembly, process control
 - **Physical AI Infrastructure**: deployment readiness, integration surface analysis, agent observability
-
----
-
-## Tech Foundation
-
-All builds in this toolkit share a common stack:
-
-- **LLM backbone**: [Anthropic Claude API](https://www.anthropic.com)
-- **Backend**: FastAPI + Pydantic v2
-- **Frontend**: React + TypeScript
-- **Output formats**: structured JSON, Markdown, future: interactive dashboard
-- **License**: Apache 2.0
 
 ---
 
@@ -187,3 +199,4 @@ Contributions, issues, and technical discussions are welcome via GitHub.
 ---
 
 *Built with Anthropic Claude. Published at [robothropicai.substack.com](https://robothropicai.substack.com).*
+
